@@ -202,7 +202,7 @@ app.post("/predict", isLoggedIn, async (req, res) => {
         payload.High_Glucose = payload.Glucose > 140 ? 1 : 0
         payload.Age_Group = payload.Age > 40 ? 1 : 0
 
-        const response = await fetch("http://127.0.0.1:8000/predict", {
+        const response = await fetch("https://diabetesplatformmlapi.onrender.com/predict", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
