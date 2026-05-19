@@ -13,6 +13,8 @@ const PORT = process.env.PORT || 5000
 const JWT_SECRET = process.env.JWT_SECRET || "secret"
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ""
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5-mini"
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || ""
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash"
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || ""
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || ""
 const PAYMENT_AMOUNT_INR = Number(process.env.PAYMENT_AMOUNT_INR || 10)
@@ -544,6 +546,77 @@ async function buildOpenAIChatbotReply(message, predictionContext = {}, conversa
     }
 }
 
+function extractGeminiText(data = {}) {
+    return String(
+        data.candidates?.[0]?.content?.parts
+            ?.map((part) => part.text || "")
+            .join("")
+            .trim() || ""
+    )
+}
+
+async function buildGeminiChatbotReply(message, predictionContext = {}, conversation = []) {
+    const normalizedMessage = String(message || "").trim()
+    const context = buildPredictionSummary(predictionContext)
+    const history = sanitizeConversationHistory(conversation)
+    const contents = [
+        ...history.map((item) => ({
+            role: item.role === "assistant" ? "model" : "user",
+            parts: [{ text: item.content }]
+        })),
+        {
+            role: "user",
+            parts: [{ text: normalizedMessage }]
+        }
+    ]
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(GEMINI_MODEL)}:generateContent`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "x-goog-api-key": GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+            systemInstruction: {
+                parts: [{ text: buildOpenAIInstructions(predictionContext) }]
+            },
+            contents,
+            generationConfig: {
+                temperature: 0.75,
+                topP: 0.95,
+                maxOutputTokens: 900
+            }
+        })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+        throw new Error(data?.error?.message || "Gemini request failed")
+    }
+
+    const reply = extractGeminiText(data)
+
+    return {
+        tone: context.riskLevel === "high" ? "error" : "success",
+        reply: normalizeReplyForBulletDisplay(reply || "I could not generate a reply just now. Please try again."),
+        suggestions: context.riskLevel === "high"
+            ? [
+                "What should I do after a high-risk result?",
+                "Give me a diabetes-friendly meal plan",
+                "Explain this in simple words",
+                "Build me a daily prevention routine"
+            ]
+            : [
+                "Ask me anything",
+                "Explain this simply",
+                "Help me plan my day",
+                "Write a professional email"
+            ],
+        mode: "gemini"
+    }
+}
+
 function buildChatbotReply(message, predictionContext = {}) {
     const normalizedMessage = normalizeChatText(message)
     const context = buildPredictionSummary(predictionContext)
@@ -762,17 +835,23 @@ app.post("/chatbot", isLoggedIn, hasPaidAccess, async (req, res) => {
 
         let replyPayload
 
-        if (openai) {
+        if (GEMINI_API_KEY) {
+            try {
+                replyPayload = await buildGeminiChatbotReply(message, predictionContext, conversation)
+            } catch (geminiError) {
+                console.error("Gemini chatbot error, trying OpenAI/local fallback:", geminiError)
+            }
+        }
+
+        if (!replyPayload && openai) {
             try {
                 replyPayload = await buildOpenAIChatbotReply(message, predictionContext, conversation)
             } catch (openaiError) {
                 console.error("OpenAI chatbot error, falling back to local guidance:", openaiError)
-                replyPayload = {
-                    mode: "fallback",
-                    ...buildChatbotReply(message, predictionContext)
-                }
             }
-        } else {
+        }
+
+        if (!replyPayload) {
             replyPayload = {
                 mode: "fallback",
                 ...buildChatbotReply(message, predictionContext)
@@ -783,7 +862,7 @@ app.post("/chatbot", isLoggedIn, hasPaidAccess, async (req, res) => {
             ...replyPayload,
             reply: normalizeReplyForBulletDisplay(replyPayload.reply),
             brand: "GlucoGuide Coach",
-            model: OPENAI_MODEL,
+            model: replyPayload.mode === "gemini" ? GEMINI_MODEL : replyPayload.mode === "openai" ? OPENAI_MODEL : "local-fallback",
             disclaimer: "Educational support only. It does not diagnose, prescribe, or replace a licensed clinician."
         })
     } catch (error) {
