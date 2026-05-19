@@ -36,6 +36,7 @@ const defaultChatPrompts = [
 let latestPredictionContext = null;
 let chatbotConversation = [];
 let userHasPaid = false;
+let paymentInProgress = false;
 
 function initializeGlucoScene() {
     if (!glucoSceneCanvas || !window.THREE) {
@@ -271,7 +272,7 @@ function setAccessState(isLoggedIn, hasPaid = false) {
     }
 }
 
-function showPaymentPrompt() {
+function showPaymentPrompt({ autoStart = false } = {}) {
     if (!paymentNotice) {
         return;
     }
@@ -290,6 +291,10 @@ function showPaymentPrompt() {
 
         if (paymentButton) {
             paymentButton.focus({ preventScroll: true });
+        }
+
+        if (autoStart && !paymentInProgress) {
+            startPayment();
         }
     }, 120);
 }
@@ -662,7 +667,7 @@ async function request(url, options = {}) {
             setAccessState(true, hasPaid);
 
             if ((url === "/register" || url === "/login") && !hasPaid) {
-                showPaymentPrompt();
+                showPaymentPrompt({ autoStart: true });
             }
         }
 
@@ -697,11 +702,16 @@ async function startPayment() {
         return;
     }
 
+    if (paymentInProgress) {
+        return;
+    }
+
     if (document.body.classList.contains("auth-locked")) {
         setStatus("Please login before payment.", "error");
         return;
     }
 
+    paymentInProgress = true;
     paymentButton.disabled = true;
     paymentStatus.textContent = "Creating payment order...";
 
@@ -783,6 +793,7 @@ async function startPayment() {
         paymentStatus.textContent = "Payment service unavailable";
         setStatus("Could not start payment. Check server connection and try again.", "error");
     } finally {
+        paymentInProgress = false;
         paymentButton.disabled = false;
     }
 }
