@@ -173,8 +173,8 @@ function initializeGlucoScene() {
         renderer.setSize(width, height, false);
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
-        root.position.x = width < 760 ? 0.05 : 1.82;
-        root.position.y = width < 760 ? 0.5 : 0.08;
+        root.position.x = width < 760 ? 0.2 : 2.08;
+        root.position.y = width < 760 ? 0.72 : 0.32;
         root.scale.setScalar(width < 760 ? 0.34 : 0.46);
     }
 
