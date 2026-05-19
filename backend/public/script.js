@@ -24,6 +24,10 @@ const chatbotContextCopy = document.getElementById("chatbotContextCopy");
 const chatbotStatusPill = document.getElementById("chatbotStatusPill");
 const glucoSceneCanvas = document.getElementById("glucoScene");
 
+document.querySelectorAll('.site-nav-links a[href="#paymentNotice"]').forEach((link) => {
+    link.remove();
+});
+
 const defaultChatPrompts = [
     "What breakfast is diabetes-friendly?",
     "How can I lower my diabetes risk?",
