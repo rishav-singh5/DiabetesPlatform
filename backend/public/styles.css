@@ -1,23 +1,23 @@
 :root {
-    --paper: #fbf7ef;
-    --paper-soft: #f3eadf;
-    --linen: #eadbca;
-    --ink: #2b160d;
-    --ink-soft: #684532;
-    --muted: #8a6d5e;
-    --cocoa: #4a2414;
-    --cocoa-deep: #221006;
-    --teal: #12645f;
-    --teal-soft: #dcefeb;
+    --paper: #e5d0bb;
+    --paper-soft: #d6bda3;
+    --linen: #c8a585;
+    --ink: #241109;
+    --ink-soft: #5b351f;
+    --muted: #77523b;
+    --cocoa: #3b1d0f;
+    --cocoa-deep: #170904;
+    --teal: #1f6b60;
+    --teal-soft: #c4d9cc;
     --blue: #2f6fb2;
     --gold: #c8944a;
     --danger: #b95d46;
     --success: #14745e;
-    --panel: rgba(255, 252, 247, 0.9);
-    --panel-strong: #fffaf3;
-    --panel-border: rgba(74, 36, 20, 0.14);
-    --shadow: 0 24px 70px rgba(59, 31, 18, 0.14);
-    --shadow-soft: 0 12px 36px rgba(59, 31, 18, 0.1);
+    --panel: rgba(226, 201, 174, 0.9);
+    --panel-strong: #dcc1a4;
+    --panel-border: rgba(62, 30, 13, 0.22);
+    --shadow: 0 24px 70px rgba(42, 20, 9, 0.2);
+    --shadow-soft: 0 12px 36px rgba(42, 20, 9, 0.16);
     --radius-lg: 8px;
     --radius-md: 6px;
     --radius-sm: 4px;
@@ -39,10 +39,10 @@ body {
     font-family: var(--font-body);
     color: var(--ink);
     background:
-        radial-gradient(circle at 8% 8%, rgba(200, 148, 74, 0.16), transparent 24%),
-        radial-gradient(circle at 92% 16%, rgba(18, 100, 95, 0.13), transparent 26%),
-        radial-gradient(circle at 14% 90%, rgba(74, 36, 20, 0.08), transparent 28%),
-        linear-gradient(180deg, #f4eadc 0%, #efe2d1 42%, #e7f0ec 100%);
+        radial-gradient(circle at 8% 8%, rgba(91, 48, 22, 0.22), transparent 24%),
+        radial-gradient(circle at 92% 16%, rgba(116, 74, 42, 0.18), transparent 26%),
+        radial-gradient(circle at 14% 90%, rgba(48, 21, 8, 0.18), transparent 28%),
+        linear-gradient(180deg, #d9bea1 0%, #c9a681 48%, #b89069 100%);
     overflow-x: hidden;
 }
 
@@ -69,8 +69,8 @@ body.is-reduced-motion .hero-3d-canvas {
     z-index: 20;
     padding: 0 34px;
     background:
-        linear-gradient(90deg, rgba(244, 234, 220, 0.96), rgba(255, 250, 243, 0.94), rgba(231, 240, 236, 0.94));
-    border-bottom: 1px solid rgba(74, 36, 20, 0.12);
+        linear-gradient(90deg, rgba(72, 37, 18, 0.95), rgba(102, 61, 34, 0.94), rgba(75, 41, 21, 0.95));
+    border-bottom: 1px solid rgba(38, 16, 6, 0.28);
     backdrop-filter: blur(18px);
 }
 
@@ -122,8 +122,8 @@ h4 {
 .brand-name {
     padding: 6px 14px;
     border: 1px solid rgba(74, 36, 20, 0.22);
-    color: var(--cocoa);
-    background: rgba(255, 250, 243, 0.72);
+    color: #f3dec4;
+    background: rgba(45, 21, 9, 0.52);
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1;
@@ -150,7 +150,7 @@ h4 {
     pointer-events: auto;
 }
 
-.site-nav-links a:nth-child(4) {
+.site-nav-links a:nth-child(3) {
     margin-left: auto;
 }
 
@@ -189,6 +189,7 @@ h4 {
     font-size: 0.96rem;
     font-weight: 750;
     letter-spacing: 0.01em;
+    color: #f0d7bb;
 }
 
 .site-nav-links a:hover,
@@ -226,7 +227,7 @@ h4 {
 .secondary-button,
 .tab-button,
 .chatbot-shortcut {
-    background: rgba(255, 252, 247, 0.72);
+    background: rgba(219, 190, 160, 0.78);
 }
 
 .hero-3d {
@@ -501,8 +502,8 @@ h4 {
     flex-wrap: wrap;
     margin: 22px 0 16px;
     padding: 5px;
-    border: 1px solid rgba(74, 36, 20, 0.12);
-    background: #f6eee4;
+    border: 1px solid rgba(74, 36, 20, 0.22);
+    background: #cda987;
     border-radius: var(--radius-md);
 }
 
@@ -548,7 +549,7 @@ textarea {
     padding: 14px 15px;
     font: inherit;
     color: var(--ink);
-    background: rgba(255, 252, 247, 0.92);
+    background: rgba(237, 213, 188, 0.94);
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
     appearance: none;
@@ -557,13 +558,13 @@ textarea {
 
 input::placeholder,
 textarea::placeholder {
-    color: #a58c7d;
+    color: #8f674f;
 }
 
 input:focus,
 textarea:focus {
     border-color: var(--teal);
-    background: #fffaf3;
+    background: #ecd3b8;
     box-shadow: 0 0 0 4px rgba(18, 100, 95, 0.12);
 }
 
@@ -578,7 +579,7 @@ textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--ink);
-    -webkit-box-shadow: 0 0 0 1000px #fffaf3 inset;
+    -webkit-box-shadow: 0 0 0 1000px #ecd3b8 inset;
     transition: background-color 9999s ease-in-out 0s;
 }
 
@@ -625,7 +626,7 @@ textarea:-webkit-autofill:focus {
 .workspace-overview-panel {
     min-height: 100%;
     background:
-        linear-gradient(180deg, rgba(18, 100, 95, 0.1), transparent 46%),
+        linear-gradient(180deg, rgba(78, 38, 17, 0.12), transparent 46%),
         var(--panel-strong);
 }
 
@@ -647,8 +648,8 @@ textarea:-webkit-autofill:focus {
 .chatbot-signal-grid article,
 .prediction-field {
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(74, 36, 20, 0.12);
-    background: rgba(255, 252, 247, 0.76);
+    border: 1px solid rgba(74, 36, 20, 0.2);
+    background: rgba(214, 181, 149, 0.72);
 }
 
 .workspace-mini-card {
@@ -754,7 +755,7 @@ body.payment-locked .site-nav-links a[href="#chatbot-section"] {
 .prediction-field:focus-within {
     transform: translateY(-1px);
     border-color: rgba(18, 100, 95, 0.28);
-    background: #fffaf3;
+    background: #e4c5a5;
 }
 
 .prediction-actions {
@@ -860,7 +861,7 @@ body.payment-locked .site-nav-links a[href="#chatbot-section"] {
 .chatbot-panel {
     display: grid;
     gap: 14px;
-    background: #fffaf3;
+    background: #d6b694;
 }
 
 .chatbot-brand-inline {
@@ -875,8 +876,8 @@ body.payment-locked .site-nav-links a[href="#chatbot-section"] {
     gap: 12px;
     padding: 12px;
     border-radius: var(--radius-lg);
-    background: #f3eadf;
-    border: 1px solid rgba(74, 36, 20, 0.1);
+    background: #cda987;
+    border: 1px solid rgba(74, 36, 20, 0.2);
 }
 
 .chat-message {
@@ -905,7 +906,7 @@ body.payment-locked .site-nav-links a[href="#chatbot-section"] {
 }
 
 .chat-message.assistant .chat-message-bubble {
-    background: #fffaf3;
+    background: #e2c4a4;
     color: var(--ink-soft);
 }
 
@@ -990,7 +991,7 @@ body.payment-locked .site-nav-links a[href="#chatbot-section"] {
     margin-top: 14px;
     border-radius: var(--radius-md);
     border: 1px solid rgba(74, 36, 20, 0.12);
-    background: #fffaf3;
+    background: #e4c5a5;
 }
 
 .sr-only {
