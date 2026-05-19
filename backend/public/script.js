@@ -22,6 +22,7 @@ const chatbotShortcuts = document.querySelector(".chatbot-shortcuts");
 const chatbotContextTitle = document.getElementById("chatbotContextTitle");
 const chatbotContextCopy = document.getElementById("chatbotContextCopy");
 const chatbotStatusPill = document.getElementById("chatbotStatusPill");
+const glucoSceneCanvas = document.getElementById("glucoScene");
 
 const defaultChatPrompts = [
     "What breakfast is diabetes-friendly?",
@@ -35,6 +36,199 @@ const defaultChatPrompts = [
 let latestPredictionContext = null;
 let chatbotConversation = [];
 let userHasPaid = false;
+
+function initializeGlucoScene() {
+    if (!glucoSceneCanvas || !window.THREE) {
+        return;
+    }
+
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.body.classList.toggle("is-reduced-motion", prefersReducedMotion);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+    camera.position.set(0, 0.15, 8.2);
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas: glucoSceneCanvas,
+        antialias: true,
+        alpha: true
+    });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+
+    const root = new THREE.Group();
+    const plusGroup = new THREE.Group();
+    const rings = new THREE.Group();
+    const careDots = new THREE.Group();
+    scene.add(root);
+    root.add(plusGroup, rings, careDots);
+
+    scene.add(new THREE.AmbientLight(0xf7dfc4, 1.35));
+
+    const keyLight = new THREE.PointLight(0x7bd8c9, 30, 18);
+    keyLight.position.set(4, 3, 5);
+    scene.add(keyLight);
+
+    const warmLight = new THREE.PointLight(0xd39c56, 22, 15);
+    warmLight.position.set(-4, -2, 4);
+    scene.add(warmLight);
+
+    const plusMaterial = new THREE.MeshStandardMaterial({
+        color: 0xf8e5c9,
+        metalness: 0.1,
+        roughness: 0.24,
+        emissive: 0x3e1d0d,
+        emissiveIntensity: 0.38
+    });
+    const plusAccentMaterial = new THREE.MeshStandardMaterial({
+        color: 0x66d8c8,
+        metalness: 0.18,
+        roughness: 0.22,
+        emissive: 0x063832,
+        emissiveIntensity: 0.54
+    });
+
+    const verticalBar = new THREE.Mesh(new THREE.BoxGeometry(0.72, 2.85, 0.34), plusMaterial);
+    const horizontalBar = new THREE.Mesh(new THREE.BoxGeometry(2.85, 0.72, 0.34), plusMaterial);
+    const core = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.82, 0.38), plusAccentMaterial);
+    plusGroup.add(verticalBar, horizontalBar, core);
+
+    const bevelDots = [
+        [0, 1.7, 0.12],
+        [0, -1.7, 0.12],
+        [1.7, 0, 0.12],
+        [-1.7, 0, 0.12]
+    ].map((position) => {
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.095, 24, 24), plusAccentMaterial);
+        dot.position.set(position[0], position[1], position[2]);
+        plusGroup.add(dot);
+        return dot;
+    });
+
+    const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0x7bd8c9,
+        transparent: true,
+        opacity: 0.22,
+        side: THREE.DoubleSide
+    });
+    const outerRingMaterial = new THREE.MeshBasicMaterial({
+        color: 0xd29a4f,
+        transparent: true,
+        opacity: 0.18,
+        side: THREE.DoubleSide
+    });
+
+    [1.92, 2.5, 3.08].forEach((radius, index) => {
+        const geometry = new THREE.TorusGeometry(radius, 0.01 + index * 0.004, 12, 160);
+        const ring = new THREE.Mesh(geometry, index === 2 ? outerRingMaterial : ringMaterial);
+        ring.rotation.x = Math.PI / 2.05;
+        ring.rotation.y = index * 0.52;
+        rings.add(ring);
+    });
+
+    const orbitMaterial = new THREE.MeshStandardMaterial({
+        color: 0xd29a4f,
+        metalness: 0.12,
+        roughness: 0.28,
+        emissive: 0x3f2406,
+        emissiveIntensity: 0.32
+    });
+    const orbitDots = [];
+    for (let index = 0; index < 10; index += 1) {
+        const angle = (index / 10) * Math.PI * 2;
+        const dot = new THREE.Mesh(new THREE.SphereGeometry(0.055 + (index % 3) * 0.018, 16, 16), index % 2 ? plusAccentMaterial : orbitMaterial);
+        dot.position.set(Math.cos(angle) * 2.9, Math.sin(angle) * 1.25, Math.sin(angle) * 0.6);
+        careDots.add(dot);
+        orbitDots.push({ dot, angle });
+    }
+
+    const particleCount = 180;
+    const particlePositions = new Float32Array(particleCount * 3);
+    for (let index = 0; index < particleCount; index += 1) {
+        particlePositions[index * 3] = (Math.random() - 0.5) * 11;
+        particlePositions[index * 3 + 1] = (Math.random() - 0.5) * 6.4;
+        particlePositions[index * 3 + 2] = (Math.random() - 0.5) * 5;
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
+    const particleMaterial = new THREE.PointsMaterial({
+        color: 0xf5dfc3,
+        size: 0.025,
+        transparent: true,
+        opacity: 0.56,
+        depthWrite: false
+    });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    scene.add(particles);
+
+    const pointer = { x: 0, y: 0 };
+
+    function resizeScene() {
+        const bounds = glucoSceneCanvas.getBoundingClientRect();
+        const width = Math.max(1, Math.floor(bounds.width));
+        const height = Math.max(1, Math.floor(bounds.height));
+        renderer.setSize(width, height, false);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        root.position.x = width < 760 ? 0.08 : 1.58;
+        root.position.y = width < 760 ? 0.64 : 0.08;
+        root.scale.setScalar(width < 760 ? 0.72 : 0.98);
+    }
+
+    window.addEventListener("resize", resizeScene);
+    window.addEventListener("pointermove", (event) => {
+        pointer.x = (event.clientX / window.innerWidth - 0.5) * 0.5;
+        pointer.y = (event.clientY / window.innerHeight - 0.5) * 0.35;
+    }, { passive: true });
+
+    resizeScene();
+
+    let frameId = 0;
+    const clock = new THREE.Clock();
+
+    function animateScene() {
+        const time = clock.getElapsedTime();
+        const speed = prefersReducedMotion ? 0.08 : 0.34;
+
+        plusGroup.rotation.y = Math.sin(time * 0.22) * 0.22 + pointer.x;
+        plusGroup.rotation.x = Math.sin(time * 0.18) * 0.08 + pointer.y * 0.55;
+        rings.rotation.z = time * speed * 0.34;
+        rings.rotation.y = Math.sin(time * 0.18) * 0.12 + pointer.x * 0.38;
+        careDots.rotation.z = -time * speed * 0.2;
+        careDots.rotation.y = plusGroup.rotation.y * 0.8;
+        particles.rotation.y = time * speed * 0.18;
+
+        const pulse = 1 + Math.sin(time * 1.15) * 0.025;
+        plusGroup.scale.setScalar(pulse);
+
+        bevelDots.forEach((dot, index) => {
+            dot.scale.setScalar(1 + Math.sin(time * 1.3 + index) * 0.12);
+        });
+
+        orbitDots.forEach((item, index) => {
+            const angle = item.angle + time * speed * 0.55;
+            item.dot.position.set(Math.cos(angle) * 2.9, Math.sin(angle) * 1.25, Math.sin(angle * 1.2) * 0.6);
+            item.dot.scale.setScalar(1 + Math.sin(time * 1.1 + index) * 0.14);
+        });
+
+        renderer.render(scene, camera);
+        frameId = window.requestAnimationFrame(animateScene);
+    }
+
+    animateScene();
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            window.cancelAnimationFrame(frameId);
+            return;
+        }
+
+        clock.getDelta();
+        animateScene();
+    });
+}
 
 function setAccessState(isLoggedIn, hasPaid = false) {
     userHasPaid = Boolean(isLoggedIn && hasPaid);
@@ -523,7 +717,7 @@ async function startPayment() {
                 email: order.email || ""
             },
             theme: {
-                color: "#4b7dff"
+                color: "#12645f"
             },
             handler: async (paymentResponse) => {
                 paymentStatus.textContent = "Verifying payment...";
@@ -849,6 +1043,7 @@ if (paymentButton) {
 }
 
 renderChatbotShortcuts(defaultChatPrompts);
+initializeGlucoScene();
 resetPredictionState();
 setAccessState(false, false);
 syncAccessState();

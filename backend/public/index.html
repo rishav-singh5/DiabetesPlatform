@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Archivo:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body class="auth-locked">
@@ -20,7 +20,7 @@
                 <div class="brand">
                     <div class="brand-mark">G</div>
                     <div>
-                        <p class="brand-name">GlucoSense AI</p>
+                        <p class="brand-name">GLUCOSENSE</p>
                         <p class="brand-subtitle">Early prediction and diabetes care platform</p>
                     </div>
                 </div>
@@ -32,6 +32,36 @@
                     <a href="#chatbot-section" class="chatbot-nav-link">Chatbot</a>
                 </div>
             </nav>
+        </section>
+
+        <section class="hero-3d" aria-labelledby="hero-title">
+            <canvas id="glucoScene" class="hero-3d-canvas" aria-hidden="true"></canvas>
+            <div class="hero-3d-content">
+                <p class="hero-kicker">AI Diabetes Intelligence</p>
+                <h1 id="hero-title">Health is wealth, invest wisely</h1>
+                <p class="hero-copy">
+                    A refined diabetes screening workspace with model-backed prediction,
+                    secure Razorpay access, and calm AI coaching for everyday follow-up.
+                </p>
+                <div class="hero-actions">
+                    <a class="primary-link" href="#auth-panel">Enter Workspace</a>
+                    <a class="secondary-link" href="#prediction-section">Explore Screening</a>
+                </div>
+            </div>
+            <div class="hero-3d-metrics" aria-label="Platform highlights">
+                <article>
+                    <span>86.1%</span>
+                    <p>Best model accuracy</p>
+                </article>
+                <article>
+                    <span>Rs 10</span>
+                    <p>Premium unlock</p>
+                </article>
+                <article>
+                    <span>AI</span>
+                    <p>Context-aware coach</p>
+                </article>
+            </div>
         </section>
 
         <section id="auth-panel" class="workspace-grid workspace-command">
@@ -46,8 +76,8 @@
 
                 <div class="auth-panel-intro">
                     <p>
-                        Access GlucoSense AI to use early diabetes prediction, model-backed screening, and upcoming
-                        lifestyle, diet, and GlucoGuide chatbot support features.
+                        Access GlucoSense AI to use early diabetes prediction, model-backed screening,
+                        lifestyle guidance, and GlucoGuide chatbot support.
                     </p>
                 </div>
 
@@ -118,13 +148,13 @@
                 <div class="panel-header">
                     <div>
                         <p class="card-kicker">Quick Preview</p>
-                        <h3>Login first, then unlock prediction and AI follow-up</h3>
+                        <h3>Login first, then unlock a guided screening flow</h3>
                     </div>
                     <span class="live-badge">Secure Flow</span>
                 </div>
 
                 <p class="workspace-overview-copy">
-                    Sign in to access diabetes screening, context-aware chatbot replies, and a smoother guided workflow.
+                    Sign in to access diabetes screening, context-aware chatbot replies, and a calmer guided workflow.
                 </p>
 
                 <div class="workspace-overview-grid">
@@ -144,7 +174,7 @@
 
         <section id="lockedNotice" class="feature-card access-lock-card">
             <p class="card-kicker">Protected Workspace</p>
-            <h2>Login first to unlock prediction, AI coaching, and guided follow-up</h2>
+                <h2>Login first to unlock screening, AI coaching, and guided follow-up</h2>
             <p>
                 GlucoSense AI services stay locked until the user signs in. After login, the prediction engine,
                 diabetes support sections, and the GlucoGuide Coach area can be unlocked in the same workspace.
@@ -165,7 +195,7 @@
                 <span class="live-badge">Razorpay Test</span>
             </div>
             <p>
-                Your account is signed in. Complete the one-time Razorpay payment to use the diabetes prediction
+                Your account is signed in. Complete the one-time Razorpay payment to use the diabetes screening
                 model and chatbot services.
             </p>
             <div class="payment-actions">
@@ -178,8 +208,8 @@
         <section id="prediction-section" class="prediction-section">
             <div class="section-heading">
                 <p class="eyebrow">Prediction Engine</p>
-                <h2>Run a fast diabetes risk screening</h2>
-                <p class="lead">Enter patient details within the suggested clinical range so the result feels cleaner, more realistic, and easier to act on.</p>
+                <h2>Run a composed diabetes risk screening</h2>
+                <p class="lead">Enter patient details within the suggested clinical range and receive a clear result with the next step ready to act on.</p>
             </div>
 
             <form id="predictForm" class="prediction-form" novalidate>
@@ -396,6 +426,7 @@
     </main>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="/script.js"></script>
 </body>
 </html>
