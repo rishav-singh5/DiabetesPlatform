@@ -552,6 +552,7 @@ label span,
 input,
 textarea {
     width: 100%;
+    min-width: 0;
     border-radius: var(--radius-md);
     border: 1px solid rgba(74, 36, 20, 0.18);
     padding: 14px 15px;
@@ -1048,7 +1049,7 @@ button:disabled {
         grid-template-columns: 1fr;
     }
 
-.hero-3d {
+    .hero-3d {
         grid-template-columns: 1fr;
         min-height: 590px;
     }
@@ -1059,8 +1060,13 @@ button:disabled {
 }
 
 @media (max-width: 720px) {
+    body {
+        background:
+            linear-gradient(180deg, #dbc0a4 0%, #c9a681 55%, #b89069 100%);
+    }
+
     .app-shell {
-        gap: 24px;
+        gap: 22px;
         padding-bottom: 36px;
     }
 
@@ -1072,24 +1078,29 @@ button:disabled {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         width: 100%;
-        gap: 10px;
+        gap: 8px;
     }
 
     .site-nav-links a {
         justify-content: center;
         border: 1px solid rgba(74, 36, 20, 0.16);
-        padding: 9px 10px;
-        font-size: 0.95rem;
+        padding: 9px 8px;
+        font-size: 0.86rem;
+        min-height: 40px;
     }
 
     .hero-3d {
-        min-height: 580px;
-        padding: 30px 20px;
+        min-height: 540px;
+        padding: 28px 18px;
         align-items: end;
     }
 
     .hero-3d h1 {
-        font-size: clamp(3rem, 15vw, 4.9rem);
+        font-size: clamp(2.7rem, 13vw, 4.4rem);
+    }
+
+    .hero-copy {
+        line-height: 1.62;
     }
 
     .hero-actions {
@@ -1106,7 +1117,7 @@ button:disabled {
     .feature-card,
     .service-area,
     .performance-section {
-        width: min(100% - 28px, 1220px);
+        width: min(100% - 24px, 1220px);
     }
 
     .panel-header,
@@ -1122,8 +1133,43 @@ button:disabled {
         flex-direction: column;
     }
 
+    .tab-button,
+    .actions .secondary-button,
+    .payment-actions .primary-button,
+    .payment-status,
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+    }
+
+    .payment-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .payment-status {
+        min-height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 10px;
+        border: 1px solid rgba(74, 36, 20, 0.16);
+        border-radius: var(--radius-sm);
+        background: rgba(237, 213, 188, 0.64);
+        text-align: center;
+    }
+
     .prediction-form {
         grid-template-columns: 1fr;
+    }
+
+    .prediction-field,
+    .chatbot-context-card,
+    .chatbot-panel,
+    .chatbot-signal-grid article,
+    .workspace-mini-card,
+    .performance-card {
+        padding: 15px;
     }
 
     .prediction-chatbot-link {
@@ -1136,5 +1182,51 @@ button:disabled {
 
     .chat-message-bubble {
         width: 100%;
+    }
+
+    .chatbot-messages {
+        min-height: 320px;
+        max-height: 440px;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand {
+        gap: 8px;
+    }
+
+    .brand-name {
+        padding: 6px 10px;
+        font-size: 0.82rem;
+        letter-spacing: 0.14em;
+    }
+
+    .brand-mark {
+        width: 30px;
+        height: 30px;
+    }
+
+    .site-nav-links {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-3d {
+        min-height: 510px;
+    }
+
+    .hero-3d h1 {
+        font-size: clamp(2.45rem, 12vw, 3.35rem);
+    }
+
+    h2 {
+        font-size: clamp(1.86rem, 9vw, 2.45rem);
+    }
+
+    .auth-panel,
+    .workspace-overview,
+    .prediction-section,
+    .chatbot-section,
+    .feature-card {
+        padding: 18px;
     }
 }

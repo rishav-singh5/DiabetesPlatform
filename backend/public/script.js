@@ -42,6 +42,10 @@ let chatbotConversation = [];
 let userHasPaid = false;
 let paymentInProgress = false;
 
+function isMobilePaymentDevice() {
+    return window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
+}
+
 function initializeGlucoScene() {
     if (!glucoSceneCanvas || !window.THREE) {
         return;
@@ -747,6 +751,7 @@ async function startPayment() {
             return;
         }
 
+        const isMobileDevice = isMobilePaymentDevice();
         const checkout = new window.Razorpay({
             key: order.razorpayKeyId,
             amount: order.amount,
@@ -754,6 +759,44 @@ async function startPayment() {
             name: "GlucoSense AI",
             description: "Premium access for prediction and chatbot",
             order_id: order.orderId,
+            method: {
+                upi: true,
+                card: true,
+                netbanking: true,
+                wallet: true
+            },
+            config: {
+                display: {
+                    blocks: {
+                        upi: {
+                            name: isMobileDevice ? "Pay by UPI app" : "Pay by UPI",
+                            instruments: [
+                                {
+                                    method: "upi"
+                                }
+                            ]
+                        },
+                        other: {
+                            name: "Other payment methods",
+                            instruments: [
+                                {
+                                    method: "card"
+                                },
+                                {
+                                    method: "netbanking"
+                                },
+                                {
+                                    method: "wallet"
+                                }
+                            ]
+                        }
+                    },
+                    sequence: ["block.upi", "block.other"],
+                    preferences: {
+                        show_default_blocks: false
+                    }
+                }
+            },
             prefill: {
                 name: order.name || "",
                 email: order.email || ""
