@@ -271,6 +271,29 @@ function setAccessState(isLoggedIn, hasPaid = false) {
     }
 }
 
+function showPaymentPrompt() {
+    if (!paymentNotice) {
+        return;
+    }
+
+    setResult(
+        "Payment required",
+        "Login successful. Please complete the one-time Rs 10 payment to unlock prediction and GlucoGuide Coach."
+    );
+    setStatus("Payment required: click Pay Rs 10 to continue.", "info");
+
+    window.setTimeout(() => {
+        paymentNotice.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+
+        if (paymentButton) {
+            paymentButton.focus({ preventScroll: true });
+        }
+    }, 120);
+}
+
 function setStatus(message, tone = "info") {
     if (!statusBox) {
         return;
@@ -635,7 +658,12 @@ async function request(url, options = {}) {
         setStatus(data.message || (response.ok ? "Success" : "Something went wrong"), response.ok ? "success" : "error");
 
         if (response.ok && (url === "/register" || url === "/login" || url === "/profile")) {
-            setAccessState(true, Boolean(data?.user?.hasPaid));
+            const hasPaid = Boolean(data?.user?.hasPaid);
+            setAccessState(true, hasPaid);
+
+            if ((url === "/register" || url === "/login") && !hasPaid) {
+                showPaymentPrompt();
+            }
         }
 
         if (response.ok && url === "/logout") {
