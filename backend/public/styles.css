@@ -67,7 +67,7 @@ body.is-reduced-motion .hero-3d-canvas {
     position: sticky;
     top: 0;
     z-index: 20;
-    padding: 0 34px;
+    padding: 8px 34px 14px;
     background:
         linear-gradient(90deg, rgba(72, 37, 18, 0.95), rgba(102, 61, 34, 0.94), rgba(75, 41, 21, 0.95));
     border-bottom: 1px solid rgba(38, 16, 6, 0.28);
@@ -75,11 +75,11 @@ body.is-reduced-motion .hero-3d-canvas {
 }
 
 .site-nav {
-    min-height: 46px;
+    min-height: 78px;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 24px;
+    align-items: start;
+    gap: 18px;
 }
 
 .brand {
@@ -88,7 +88,7 @@ body.is-reduced-motion .hero-3d-canvas {
     align-items: center;
     gap: 12px;
     justify-content: center;
-    transform: translateY(-1px);
+    transform: translateY(-5px);
 }
 
 .brand-mark {
@@ -140,10 +140,11 @@ h4 {
     grid-column: 1 / -1;
     grid-row: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 24px;
+    gap: 14px;
     pointer-events: none;
+    padding-top: 0;
 }
 
 .site-nav-links a {
@@ -186,14 +187,17 @@ h4 {
 }
 
 .site-nav-links a {
-    min-height: auto;
-    border: 0;
-    padding: 0;
+    min-height: 38px;
+    border: 1px solid rgba(242, 216, 188, 0.28);
+    border-radius: var(--radius-sm);
+    padding: 9px 16px;
     font-family: var(--font-body);
     font-size: 0.96rem;
     font-weight: 750;
     letter-spacing: 0.01em;
     color: #f0d7bb;
+    background: rgba(45, 21, 9, 0.34);
+    box-shadow: 0 10px 20px rgba(23, 9, 4, 0.12);
 }
 
 .site-nav-links a:hover,
