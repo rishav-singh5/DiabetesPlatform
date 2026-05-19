@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const OpenAI = require("openai")
 const path = require("path")
+const crypto = require("crypto")
 require("dotenv").config({ path: path.join(__dirname, ".env") })
 
 const app = express()
@@ -12,6 +13,10 @@ const PORT = process.env.PORT || 5000
 const JWT_SECRET = process.env.JWT_SECRET || "secret"
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY || ""
 const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-5-mini"
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || ""
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || ""
+const PAYMENT_AMOUNT_INR = Number(process.env.PAYMENT_AMOUNT_INR || 10)
+const PAYMENT_AMOUNT_PAISE = PAYMENT_AMOUNT_INR * 100
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null
 
 app.use(express.json())
@@ -29,6 +34,15 @@ mongoose.connect(process.env.MONGO_URI)
     .catch((err) => console.log(err))
 
 const userModel = require("./models/user")
+
+function buildUserResponse(user) {
+    return {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        hasPaid: Boolean(user.paymentAccess?.hasPaid)
+    }
+}
 
 app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"))
@@ -74,11 +88,7 @@ app.post("/register", async (req, res) => {
         res.cookie("token", token, { httpOnly: true })
         res.status(201).json({
             message: "Registered and logged in",
-            user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email
-            }
+            user: buildUserResponse(newUser)
         })
 
         console.log("Register response sent successfully for", email)
@@ -111,11 +121,7 @@ app.post("/login", async (req, res) => {
         res.cookie("token", token, { httpOnly: true })
         res.json({
             message: "Login successful",
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
+            user: buildUserResponse(user)
         })
     } catch (error) {
         console.error("Login error:", error)
@@ -168,6 +174,26 @@ function isLoggedIn(req, res, next) {
     }
 }
 
+async function hasPaidAccess(req, res, next) {
+    try {
+        const user = await userModel.findById(req.user.userid)
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        if (!user.paymentAccess?.hasPaid) {
+            return res.status(402).json({ message: "Please complete the Rs 10 payment to unlock this service" })
+        }
+
+        req.currentUser = user
+        next()
+    } catch (error) {
+        console.error("Payment access check error:", error)
+        res.status(500).json({ message: "Could not verify payment access" })
+    }
+}
+
 app.get("/profile", isLoggedIn, async (req, res) => {
     const user = await userModel.findById(req.user.userid)
 
@@ -176,11 +202,7 @@ app.get("/profile", isLoggedIn, async (req, res) => {
     }
 
     res.json({
-        user: {
-            id: user._id,
-            name: user.name,
-            email: user.email
-        }
+        user: buildUserResponse(user)
     })
 })
 
@@ -189,7 +211,137 @@ app.get("/logout", (req, res) => {
     res.json({ message: "Logged out" })
 })
 
-app.post("/predict", isLoggedIn, async (req, res) => {
+app.get("/payment/status", isLoggedIn, async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.userid)
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        res.json({
+            hasPaid: Boolean(user.paymentAccess?.hasPaid),
+            amount: PAYMENT_AMOUNT_INR,
+            currency: "INR",
+            razorpayKeyId: RAZORPAY_KEY_ID
+        })
+    } catch (error) {
+        console.error("Payment status error:", error)
+        res.status(500).json({ message: "Could not fetch payment status" })
+    }
+})
+
+app.post("/payment/create-order", isLoggedIn, async (req, res) => {
+    try {
+        if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
+            return res.status(500).json({ message: "Razorpay keys are missing on the server" })
+        }
+
+        const user = await userModel.findById(req.user.userid)
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        if (user.paymentAccess?.hasPaid) {
+            return res.json({
+                alreadyPaid: true,
+                hasPaid: true,
+                amount: PAYMENT_AMOUNT_INR,
+                currency: "INR",
+                razorpayKeyId: RAZORPAY_KEY_ID
+            })
+        }
+
+        const authToken = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64")
+        const razorpayResponse = await fetch("https://api.razorpay.com/v1/orders", {
+            method: "POST",
+            headers: {
+                "Authorization": `Basic ${authToken}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                amount: PAYMENT_AMOUNT_PAISE,
+                currency: "INR",
+                receipt: `glucosense_${String(user._id).slice(-12)}_${Date.now()}`,
+                notes: {
+                    userId: String(user._id),
+                    email: user.email
+                }
+            })
+        })
+
+        const order = await razorpayResponse.json()
+
+        if (!razorpayResponse.ok) {
+            return res.status(razorpayResponse.status).json({
+                message: order?.error?.description || "Could not create Razorpay order"
+            })
+        }
+
+        res.json({
+            orderId: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            razorpayKeyId: RAZORPAY_KEY_ID,
+            name: user.name,
+            email: user.email
+        })
+    } catch (error) {
+        console.error("Create payment order error:", error)
+        res.status(500).json({ message: "Payment order creation failed" })
+    }
+})
+
+app.post("/payment/verify", isLoggedIn, async (req, res) => {
+    try {
+        if (!RAZORPAY_KEY_SECRET) {
+            return res.status(500).json({ message: "Razorpay secret is missing on the server" })
+        }
+
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body || {}
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return res.status(400).json({ message: "Payment verification details are missing" })
+        }
+
+        const expectedSignature = crypto
+            .createHmac("sha256", RAZORPAY_KEY_SECRET)
+            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+            .digest("hex")
+
+        if (expectedSignature !== razorpay_signature) {
+            return res.status(400).json({ message: "Payment verification failed" })
+        }
+
+        const user = await userModel.findByIdAndUpdate(
+            req.user.userid,
+            {
+                $set: {
+                    "paymentAccess.hasPaid": true,
+                    "paymentAccess.paidAt": new Date(),
+                    "paymentAccess.razorpayOrderId": razorpay_order_id,
+                    "paymentAccess.razorpayPaymentId": razorpay_payment_id
+                }
+            },
+            { new: true }
+        )
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        res.json({
+            message: "Payment verified. Prediction and chatbot are unlocked.",
+            user: buildUserResponse(user)
+        })
+    } catch (error) {
+        console.error("Payment verification error:", error)
+        res.status(500).json({ message: "Payment verification failed" })
+    }
+})
+
+app.post("/predict", isLoggedIn, hasPaidAccess, async (req, res) => {
     try {
         const payload = {
             ...req.body,
@@ -598,7 +750,7 @@ function buildChatbotReply(message, predictionContext = {}) {
     }
 }
 
-app.post("/chatbot", isLoggedIn, async (req, res) => {
+app.post("/chatbot", isLoggedIn, hasPaidAccess, async (req, res) => {
     try {
         const { message, predictionContext, conversation } = req.body || {}
 

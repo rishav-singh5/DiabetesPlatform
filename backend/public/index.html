@@ -25,6 +25,7 @@
                 </div>
                 <div class="site-nav-links">
                     <a href="#auth-panel">Access</a>
+                    <a href="#paymentNotice">Payment</a>
                     <a href="#prediction-section">Prediction</a>
                     <a href="#performance-section">Model Results</a>
                     <a href="#chatbot-section" class="chatbot-nav-link">Chatbot</a>
@@ -145,12 +146,30 @@
             <h2>Login first to unlock prediction, AI coaching, and guided follow-up</h2>
             <p>
                 GlucoSense AI services stay locked until the user signs in. After login, the prediction engine,
-                diabetes support sections, and the GlucoGuide Coach area become available in the same workspace.
+                diabetes support sections, and the GlucoGuide Coach area can be unlocked in the same workspace.
             </p>
             <div class="tag-row">
                 <span>Prediction Locked</span>
                 <span>Chatbot Locked</span>
                 <span>Login Required</span>
+            </div>
+        </section>
+
+        <section id="paymentNotice" class="feature-card payment-lock-card">
+            <div class="panel-header">
+                <div>
+                    <p class="card-kicker">Premium Access</p>
+                    <h2>Pay Rs 10 to unlock prediction and GlucoGuide Coach</h2>
+                </div>
+                <span class="live-badge">Razorpay Test</span>
+            </div>
+            <p>
+                Your account is signed in. Complete the one-time Razorpay payment to use the diabetes prediction
+                model and chatbot services.
+            </p>
+            <div class="payment-actions">
+                <button id="payment-button" class="primary-button" type="button">Pay Rs 10</button>
+                <span id="payment-status" class="payment-status">Payment required</span>
             </div>
         </section>
 
@@ -375,6 +394,7 @@
 
     </main>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="/script.js"></script>
 </body>
 </html>

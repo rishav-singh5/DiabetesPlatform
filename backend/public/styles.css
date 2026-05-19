@@ -473,12 +473,45 @@ body.auth-ready .access-lock-card {
     display: none;
 }
 
-body.auth-locked .service-area {
+body.auth-locked .payment-lock-card,
+body.payment-ready .payment-lock-card {
+    display: none;
+}
+
+body.auth-locked .service-area,
+body.payment-locked .service-area {
     display: none;
 }
 
 body.auth-locked .site-nav-links a:not([href="#auth-panel"]) {
     display: none;
+}
+
+body.payment-locked .site-nav-links a[href="#prediction-section"],
+body.payment-locked .site-nav-links a[href="#performance-section"],
+body.payment-locked .site-nav-links a[href="#chatbot-section"] {
+    display: none;
+}
+
+.payment-lock-card {
+    display: grid;
+    gap: 16px;
+}
+
+.payment-lock-card h2 {
+    max-width: 18ch;
+}
+
+.payment-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.payment-status {
+    color: var(--muted);
+    font-weight: 700;
 }
 
 .section-heading {

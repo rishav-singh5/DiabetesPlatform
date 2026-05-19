@@ -6,6 +6,9 @@ const resultCopy = document.getElementById("result-copy");
 const predictionBox = document.getElementById("predictionResult");
 const serviceArea = document.getElementById("serviceArea");
 const lockedNotice = document.getElementById("lockedNotice");
+const paymentNotice = document.getElementById("paymentNotice");
+const paymentButton = document.getElementById("payment-button");
+const paymentStatus = document.getElementById("payment-status");
 const predictionBadge = document.getElementById("predictionBadge");
 const predictionTitle = document.getElementById("predictionTitle");
 const predictionCopy = document.getElementById("predictionCopy");
@@ -31,22 +34,42 @@ const defaultChatPrompts = [
 
 let latestPredictionContext = null;
 let chatbotConversation = [];
+let userHasPaid = false;
 
-function setAccessState(isLoggedIn) {
+function setAccessState(isLoggedIn, hasPaid = false) {
+    userHasPaid = Boolean(isLoggedIn && hasPaid);
     document.body.classList.toggle("auth-locked", !isLoggedIn);
     document.body.classList.toggle("auth-ready", isLoggedIn);
+    document.body.classList.toggle("payment-locked", Boolean(isLoggedIn && !hasPaid));
+    document.body.classList.toggle("payment-ready", Boolean(isLoggedIn && hasPaid));
 
     if (serviceArea) {
-        serviceArea.setAttribute("aria-hidden", isLoggedIn ? "false" : "true");
+        serviceArea.setAttribute("aria-hidden", userHasPaid ? "false" : "true");
     }
 
     if (lockedNotice) {
         lockedNotice.setAttribute("aria-hidden", isLoggedIn ? "true" : "false");
     }
 
-    if (isLoggedIn) {
+    if (paymentNotice) {
+        paymentNotice.setAttribute("aria-hidden", isLoggedIn && !hasPaid ? "false" : "true");
+    }
+
+    if (paymentStatus) {
+        paymentStatus.textContent = !isLoggedIn
+            ? "Login required"
+            : hasPaid
+                ? "Payment verified"
+                : "Payment required";
+    }
+
+    if (isLoggedIn && hasPaid) {
         setChatbotStatus("Ready to guide", "success");
         seedChatbotIntro();
+    } else if (isLoggedIn) {
+        setChatbotStatus("Payment required", "info");
+        resetPredictionState();
+        resetChatbotExperience();
     } else {
         setChatbotStatus("Login to unlock", "info");
         resetPredictionState();
@@ -418,15 +441,15 @@ async function request(url, options = {}) {
         setStatus(data.message || (response.ok ? "Success" : "Something went wrong"), response.ok ? "success" : "error");
 
         if (response.ok && (url === "/register" || url === "/login" || url === "/profile")) {
-            setAccessState(true);
+            setAccessState(true, Boolean(data?.user?.hasPaid));
         }
 
         if (response.ok && url === "/logout") {
-            setAccessState(false);
+            setAccessState(false, false);
         }
 
         if (!response.ok && response.status === 401) {
-            setAccessState(false);
+            setAccessState(false, false);
         }
 
         return { response, data };
@@ -441,9 +464,104 @@ async function syncAccessState() {
     const result = await request("/profile");
 
     if (!result || !result.response.ok) {
-        setAccessState(false);
+        setAccessState(false, false);
         setResult("No active session yet", "Log in to continue with early prediction, diabetes support, and your account workspace.");
         setStatus("Login required to unlock prediction, lifestyle support, and chatbot guidance.", "info");
+    }
+}
+
+async function startPayment() {
+    if (!paymentButton) {
+        return;
+    }
+
+    if (document.body.classList.contains("auth-locked")) {
+        setStatus("Please login before payment.", "error");
+        return;
+    }
+
+    paymentButton.disabled = true;
+    paymentStatus.textContent = "Creating payment order...";
+
+    try {
+        const response = await fetch("/payment/create-order", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        const order = await response.json();
+
+        if (!response.ok) {
+            paymentStatus.textContent = order.message || "Payment order failed";
+            setStatus(order.message || "Payment order failed.", "error");
+            return;
+        }
+
+        if (order.alreadyPaid) {
+            setAccessState(true, true);
+            setStatus("Payment already verified. Services are unlocked.", "success");
+            return;
+        }
+
+        if (!window.Razorpay) {
+            paymentStatus.textContent = "Razorpay checkout script unavailable";
+            setStatus("Razorpay checkout could not load. Check network and try again.", "error");
+            return;
+        }
+
+        const checkout = new window.Razorpay({
+            key: order.razorpayKeyId,
+            amount: order.amount,
+            currency: order.currency,
+            name: "GlucoSense AI",
+            description: "Premium access for prediction and chatbot",
+            order_id: order.orderId,
+            prefill: {
+                name: order.name || "",
+                email: order.email || ""
+            },
+            theme: {
+                color: "#4b7dff"
+            },
+            handler: async (paymentResponse) => {
+                paymentStatus.textContent = "Verifying payment...";
+
+                const verifyResponse = await fetch("/payment/verify", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(paymentResponse)
+                });
+                const verifyResult = await verifyResponse.json();
+
+                if (!verifyResponse.ok) {
+                    paymentStatus.textContent = verifyResult.message || "Payment verification failed";
+                    setStatus(verifyResult.message || "Payment verification failed.", "error");
+                    return;
+                }
+
+                setAccessState(true, true);
+                setResult("Payment verified", "Prediction and GlucoGuide Coach are now unlocked for this account.");
+                setStatus(verifyResult.message || "Payment verified. Services unlocked.", "success");
+            },
+            modal: {
+                ondismiss: () => {
+                    paymentStatus.textContent = "Payment required";
+                    setStatus("Payment was not completed.", "info");
+                }
+            }
+        });
+
+        checkout.open();
+    } catch (error) {
+        paymentStatus.textContent = "Payment service unavailable";
+        setStatus("Could not start payment. Check server connection and try again.", "error");
+    } finally {
+        paymentButton.disabled = false;
     }
 }
 
@@ -459,6 +577,11 @@ async function sendChatMessage(message) {
 
     if (document.body.classList.contains("auth-locked")) {
         setStatus("Login required before using GlucoGuide Coach.", "error");
+        return;
+    }
+
+    if (!userHasPaid) {
+        setStatus("Please complete the Rs 10 payment before using GlucoGuide Coach.", "error");
         return;
     }
 
@@ -490,7 +613,11 @@ async function sendChatMessage(message) {
 
         if (!response.ok) {
             if (response.status === 401) {
-                setAccessState(false);
+                setAccessState(false, false);
+            }
+
+            if (response.status === 402) {
+                setAccessState(true, false);
             }
 
             appendChatMessage(
@@ -598,6 +725,18 @@ if (predictForm) {
             return;
         }
 
+        if (!userHasPaid) {
+            setPredictionMessage({
+                badge: "Rs",
+                title: "Payment required",
+                copy: "Please complete the one-time Rs 10 payment to use the diabetes prediction service.",
+                suggestion: "After payment verification, prediction and GlucoGuide Coach will unlock automatically.",
+                tone: "error"
+            });
+            setStatus("Payment required before using prediction services.", "error");
+            return;
+        }
+
         if (!predictForm.reportValidity()) {
             setPredictionMessage({
                 badge: "!",
@@ -634,7 +773,11 @@ if (predictForm) {
 
             if (!response.ok || typeof result.prediction === "undefined") {
                 if (response.status === 401) {
-                    setAccessState(false);
+                    setAccessState(false, false);
+                }
+
+                if (response.status === 402) {
+                    setAccessState(true, false);
                 }
 
                 setPredictionMessage({
@@ -701,7 +844,11 @@ if (chatbotShortcuts) {
     });
 }
 
+if (paymentButton) {
+    paymentButton.addEventListener("click", startPayment);
+}
+
 renderChatbotShortcuts(defaultChatPrompts);
 resetPredictionState();
-setAccessState(false);
+setAccessState(false, false);
 syncAccessState();
