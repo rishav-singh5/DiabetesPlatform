@@ -15,16 +15,25 @@ FEATURE_COLUMNS = [
     "Age",
     "BMI_Category",
     "High_Glucose",
-    "Age_Group"
+    "Age_Group",
 ]
 
-# load model + scaler once
 model = joblib.load(BASE_DIR / "model.pkl")
 scaler = joblib.load(BASE_DIR / "scaler.pkl")
 
+
 @app.route("/")
 def home():
-    return "ML API Running 🚀"
+    return "ML API Running"
+
+
+@app.route("/health")
+def health():
+    return jsonify({
+        "status": "ok",
+        "features": FEATURE_COLUMNS,
+    })
+
 
 @app.route("/predict", methods=["POST"])
 def predict():
@@ -46,20 +55,19 @@ def predict():
             }), 500
 
         features = [float(data.get(column, 0)) for column in FEATURE_COLUMNS]
-
         features = np.array(features).reshape(1, -1)
         features = scaler.transform(features)
-
         prediction = model.predict(features)[0]
 
         return jsonify({
-            "prediction": int(prediction)
+            "prediction": int(prediction),
         })
 
     except Exception as e:
         return jsonify({
-            "error": str(e)
-        })
+            "error": str(e),
+        }), 500
+
 
 if __name__ == "__main__":
     app.run(port=8000, debug=False)

@@ -15,6 +15,15 @@ const predictionCopy = document.getElementById("predictionCopy");
 const predictionSuggestion = document.getElementById("predictionSuggestion");
 const predictionChatbotLink = document.getElementById("predictionChatbotLink");
 const predictForm = document.getElementById("predictForm");
+const assessmentSteps = document.querySelectorAll(".wizard-step");
+const assessmentBack = document.getElementById("assessmentBack");
+const assessmentNext = document.getElementById("assessmentNext");
+const assessmentSubmit = document.getElementById("assessmentSubmit");
+const assessmentStepLabel = document.getElementById("assessmentStepLabel");
+const assessmentProgressBar = document.getElementById("assessmentProgressBar");
+const assessmentHint = document.getElementById("assessmentHint");
+const riskMeter = document.getElementById("riskMeter");
+const driverList = document.getElementById("driverList");
 const chatbotForm = document.getElementById("chatbotForm");
 const chatbotInput = document.getElementById("chatbotInput");
 const chatbotMessages = document.getElementById("chatbotMessages");
@@ -42,6 +51,39 @@ let latestPredictionContext = null;
 let chatbotConversation = [];
 let userHasPaid = false;
 let paymentInProgress = false;
+let currentAssessmentStep = 0;
+
+const modelFieldNames = [
+    "Pregnancies",
+    "Glucose",
+    "BloodPressure",
+    "SkinThickness",
+    "Insulin",
+    "BMI",
+    "Age"
+];
+
+const rangeDisplayUnits = {
+    Age: " years",
+    BMI: "",
+    Glucose: " mg/dL",
+    BloodPressure: " mmHg",
+    Pregnancies: "",
+    SkinThickness: " mm",
+    Insulin: " mu U/ml"
+};
+
+const assessmentHints = [
+    "Knowing your risk is the first smart step.",
+    "BMI is one signal, not a judgment. You are not your numbers.",
+    "Use a recent fasting glucose value if you have one.",
+    "Blood pressure can change through the day, so trends matter.",
+    "Select 0 when this question does not apply.",
+    "This model uses classic clinical dataset fields.",
+    "If insulin is unknown, keep the default and discuss uncertainty with a provider.",
+    "Family history helps frame the conversation with your doctor.",
+    "Small, repeatable movement habits can lower long-term risk."
+];
 
 function isMobilePaymentDevice() {
     return window.matchMedia("(max-width: 760px), (pointer: coarse)").matches;
@@ -133,7 +175,7 @@ function setResult(title, copy) {
     resultCopy.textContent = copy;
 }
 
-function setPredictionMessage({ badge = "GS", title, copy, suggestion, tone = "info" }) {
+function setPredictionMessage({ badge = "GS", title, copy, suggestion, tone = "info", riskPercent = 0, drivers = [] }) {
     if (!predictionBox || !predictionBadge || !predictionTitle || !predictionCopy || !predictionSuggestion || !predictionChatbotLink) {
         return;
     }
@@ -145,8 +187,26 @@ function setPredictionMessage({ badge = "GS", title, copy, suggestion, tone = "i
     predictionCopy.textContent = copy;
     predictionSuggestion.textContent = suggestion;
 
+    if (riskMeter) {
+        const meterFill = riskMeter.querySelector("span");
+        if (meterFill) {
+            meterFill.style.width = `${Math.max(0, Math.min(100, Number(riskPercent) || 0))}%`;
+        }
+    }
+
+    if (driverList) {
+        driverList.innerHTML = "";
+        drivers.slice(0, 5).forEach((driver) => {
+            const chip = document.createElement("span");
+            chip.textContent = driver;
+            driverList.append(chip);
+        });
+    }
+
     if (tone === "error") {
-        predictionChatbotLink.textContent = "Open Chatbot for Higher-Risk Tips";
+        predictionChatbotLink.textContent = "Open Chatbot for Provider Questions";
+    } else if (tone === "warning") {
+        predictionChatbotLink.textContent = "Open Chatbot for Prevention Tips";
     } else if (tone === "success") {
         predictionChatbotLink.textContent = "Open Chatbot for Prevention Tips";
     } else {
@@ -231,6 +291,204 @@ function switchTab(tabName) {
     forms.forEach((form) => {
         form.classList.toggle("active", form.id === `${tabName}-form`);
     });
+}
+
+function formatRangeValue(input) {
+    const numericValue = Number(input.value);
+    const value = input.step === "0.1" ? numericValue.toFixed(1) : String(Math.round(numericValue));
+    return `${value}${rangeDisplayUnits[input.name] || ""}`;
+}
+
+function updateRangeOutput(input) {
+    const output = document.querySelector(`[data-output-for="${input.name}"]`);
+    if (!output) {
+        return;
+    }
+
+    const formattedValue = formatRangeValue(input);
+    output.textContent = formattedValue;
+    output.classList.add("is-updating");
+    window.setTimeout(() => output.classList.remove("is-updating"), 140);
+    input.setAttribute("aria-label", `${input.closest(".prediction-field")?.querySelector("span")?.textContent || input.name} slider, currently ${formattedValue}`);
+}
+
+function getAssessmentFormValues() {
+    if (!predictForm) {
+        return {};
+    }
+
+    const formData = new FormData(predictForm);
+    return Object.fromEntries(formData.entries());
+}
+
+function getNumericFormValue(values, key) {
+    const numericValue = Number(values[key]);
+    return Number.isFinite(numericValue) ? numericValue : 0;
+}
+
+function buildRiskDrivers(values = {}) {
+    const drivers = [];
+    const age = getNumericFormValue(values, "Age");
+    const bmi = getNumericFormValue(values, "BMI");
+    const glucose = getNumericFormValue(values, "Glucose");
+    const pressure = getNumericFormValue(values, "BloodPressure");
+    const insulin = getNumericFormValue(values, "Insulin");
+    const familyHistory = values.FamilyHistory;
+    const activityLevel = values.ActivityLevel;
+
+    if (glucose >= 140) drivers.push("Higher glucose");
+    if (bmi >= 30) drivers.push("BMI above 30");
+    if (age >= 45) drivers.push("Age");
+    if (pressure >= 90) drivers.push("Blood pressure");
+    if (familyHistory === "yes") drivers.push("Family history");
+    if (activityLevel === "low") drivers.push("Low activity");
+    if (insulin >= 200) drivers.push("Insulin signal");
+
+    return drivers.length ? drivers : ["Balanced profile", "Prevention habits"];
+}
+
+function estimateRiskPercent(predictionValue, values = {}) {
+    let risk = predictionValue === 1 ? 62 : 12;
+    const age = getNumericFormValue(values, "Age");
+    const bmi = getNumericFormValue(values, "BMI");
+    const glucose = getNumericFormValue(values, "Glucose");
+    const pressure = getNumericFormValue(values, "BloodPressure");
+
+    if (glucose >= 140) risk += 10;
+    if (glucose >= 180) risk += 8;
+    if (bmi >= 30) risk += 7;
+    if (bmi >= 35) risk += 5;
+    if (age >= 45) risk += 5;
+    if (age >= 60) risk += 4;
+    if (pressure >= 90) risk += 4;
+    if (values.FamilyHistory === "yes") risk += 6;
+    if (values.ActivityLevel === "low") risk += 5;
+    if (values.ActivityLevel === "high") risk -= 3;
+
+    return Math.max(4, Math.min(92, Math.round(risk)));
+}
+
+function getRiskTone(riskPercent, predictionValue) {
+    if (predictionValue === 1 || riskPercent >= 50) {
+        return "error";
+    }
+
+    if (riskPercent >= 22) {
+        return "warning";
+    }
+
+    return "success";
+}
+
+function getRiskCopy(tone, riskPercent, drivers = []) {
+    const driverText = drivers.length ? ` Main factors: ${drivers.slice(0, 3).join(" + ")}.` : "";
+
+    if (tone === "error") {
+        return {
+            badge: "!",
+            title: `Worth discussing with a provider - ${riskPercent}% estimated risk`,
+            copy: `Your profile suggests a higher-risk pattern. This is not a diagnosis, but it is worth bringing to a clinician for proper testing.${driverText}`,
+            suggestion: "Ask about fasting glucose, HbA1c, blood pressure, weight trends, and what changes are realistic for you."
+        };
+    }
+
+    if (tone === "warning") {
+        return {
+            badge: "~",
+            title: `Some factors need attention - ${riskPercent}% estimated risk`,
+            copy: `Your profile suggests moderate risk signals. Small changes can help, especially around movement, meal balance, sleep, and follow-up testing.${driverText}`,
+            suggestion: "Consider a prevention plan and discuss whether HbA1c or fasting glucose testing makes sense."
+        };
+    }
+
+    return {
+        badge: "+",
+        title: `Low short-term risk pattern - ${riskPercent}% estimated risk`,
+        copy: `Your profile suggests lower short-term risk. Keep it up, and continue habits that protect long-term glucose health.${driverText}`,
+        suggestion: "Stay on track with regular movement, fiber-rich meals, sleep, and routine checkups."
+    };
+}
+
+function updateAssessmentStep() {
+    if (!assessmentSteps.length) {
+        return;
+    }
+
+    assessmentSteps.forEach((step, index) => {
+        step.classList.toggle("active", index === currentAssessmentStep);
+    });
+
+    const totalSteps = assessmentSteps.length;
+    const progress = ((currentAssessmentStep + 1) / totalSteps) * 100;
+
+    if (assessmentStepLabel) {
+        assessmentStepLabel.textContent = `Step ${currentAssessmentStep + 1} of ${totalSteps}`;
+    }
+
+    if (assessmentProgressBar) {
+        assessmentProgressBar.style.width = `${progress}%`;
+    }
+
+    if (assessmentHint) {
+        assessmentHint.textContent = assessmentHints[currentAssessmentStep] || "This tool learns from population data - your doctor knows you best.";
+    }
+
+    if (assessmentBack) {
+        assessmentBack.style.display = currentAssessmentStep === 0 ? "none" : "inline-flex";
+    }
+
+    if (assessmentNext) {
+        assessmentNext.style.display = currentAssessmentStep === totalSteps - 1 ? "none" : "inline-flex";
+    }
+
+    if (assessmentSubmit) {
+        assessmentSubmit.style.display = currentAssessmentStep === totalSteps - 1 ? "inline-flex" : "none";
+    }
+}
+
+function getCurrentStepControl() {
+    const step = assessmentSteps[currentAssessmentStep];
+    if (!step) {
+        return null;
+    }
+
+    return step.querySelector("input, textarea, button");
+}
+
+function focusCurrentAssessmentControl() {
+    const control = getCurrentStepControl();
+    if (control) {
+        control.focus({ preventScroll: true });
+    }
+}
+
+function initializeAssessmentWizard() {
+    if (!predictForm || !assessmentSteps.length) {
+        return;
+    }
+
+    predictForm.querySelectorAll('input[type="range"]').forEach((input) => {
+        updateRangeOutput(input);
+        input.addEventListener("input", () => updateRangeOutput(input));
+    });
+
+    if (assessmentBack) {
+        assessmentBack.addEventListener("click", () => {
+            currentAssessmentStep = Math.max(0, currentAssessmentStep - 1);
+            updateAssessmentStep();
+            focusCurrentAssessmentControl();
+        });
+    }
+
+    if (assessmentNext) {
+        assessmentNext.addEventListener("click", () => {
+            currentAssessmentStep = Math.min(assessmentSteps.length - 1, currentAssessmentStep + 1);
+            updateAssessmentStep();
+            focusCurrentAssessmentControl();
+        });
+    }
+
+    updateAssessmentStep();
 }
 
 const CHAT_SECTION_HEADER_PATTERN = /^[A-Za-z][A-Za-z0-9\s/&()+-]{1,48}:$/;
@@ -377,10 +635,12 @@ function resetPredictionState() {
 
     setPredictionMessage({
         badge: "GS",
-        title: "Prediction result will appear here",
-        copy: "Submit valid patient values to see the diabetes risk result along with the next suggested step.",
-        suggestion: "After the result, users can continue to the chatbot area for diet and lifestyle guidance.",
-        tone: "info"
+        title: "Your assessment summary will appear here",
+        copy: "Complete the short guided flow to see an estimated risk result and doctor-friendly next steps.",
+        suggestion: "This is for research and awareness, not a medical diagnosis.",
+        tone: "info",
+        riskPercent: 0,
+        drivers: []
     });
 
     setChatbotContext(
@@ -426,12 +686,13 @@ function describePredictionContext(context) {
     return `${context.riskLevel === "high" ? "Higher-risk" : "Lower-risk"} screening context loaded: ${signals.join(", ")}.`;
 }
 
-function updateChatbotFromPrediction(predictionValue, formValues) {
+function updateChatbotFromPrediction(predictionValue, formValues, riskPercent = null) {
     latestPredictionContext = {
         riskLevel: predictionValue === 1 ? "high" : "low",
         glucose: Number(formValues.Glucose),
         bmi: Number(formValues.BMI),
-        age: Number(formValues.Age)
+        age: Number(formValues.Age),
+        riskPercent
     };
 
     if (predictionValue === 1) {
@@ -807,7 +1068,8 @@ if (predictForm) {
                 title: "Login required",
                 copy: "Please log in first to use the diabetes prediction service.",
                 suggestion: "After login, the chatbot section will also unlock for lifestyle and diet-related questions.",
-                tone: "error"
+                tone: "error",
+                riskPercent: 0
             });
             setStatus("Login required before using prediction services.", "error");
             return;
@@ -819,7 +1081,8 @@ if (predictForm) {
                 title: "Payment required",
                 copy: "Please complete the one-time Rs 10 payment to use the diabetes prediction service.",
                 suggestion: "After payment verification, prediction and GlucoGuide Coach will unlock automatically.",
-                tone: "error"
+                tone: "error",
+                riskPercent: 0
             });
             setStatus("Payment required before using prediction services.", "error");
             return;
@@ -831,22 +1094,35 @@ if (predictForm) {
                 title: "Input needs attention",
                 copy: "Please enter values only within the allowed range shown below each field.",
                 suggestion: "Once the inputs are valid, the chatbot section can help with food, routine, and prevention-related questions.",
-                tone: "error"
+                tone: "error",
+                riskPercent: 0
             });
             return;
         }
 
         const formData = new FormData(predictForm);
-        const data = Object.fromEntries(formData.entries());
+        const allValues = Object.fromEntries(formData.entries());
+        const data = modelFieldNames.reduce((payload, fieldName) => {
+            payload[fieldName] = allValues[fieldName];
+            return payload;
+        }, {});
 
         try {
             setPredictionMessage({
                 badge: "...",
-                title: "Prediction in progress",
-                copy: "Checking diabetes risk with the trained model and preparing the user guidance card.",
-                suggestion: "After the result appears, users can continue to the chatbot section for lifestyle-related queries.",
-                tone: "info"
+                title: "Analyzing health data...",
+                copy: "Checking your values with the trained model and preparing a doctor-friendly guidance card.",
+                suggestion: "This usually takes a moment. The result is educational, not diagnostic.",
+                tone: "info",
+                riskPercent: 35,
+                drivers: ["Model running"]
             });
+
+            const submitButton = assessmentSubmit || predictForm.querySelector("button[type='submit']");
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = "Analyzing...";
+            }
 
             const response = await fetch("/predict", {
                 method: "POST",
@@ -873,34 +1149,29 @@ if (predictForm) {
                     title: "Prediction request failed",
                     copy: result.error || "Please verify the backend and ML API connection, then try again.",
                     suggestion: "The chatbot area can still be used later for lifestyle, prevention, and diabetes-awareness questions.",
-                    tone: "error"
+                    tone: "error",
+                    riskPercent: 0
                 });
                 return;
             }
 
-            if (result.prediction === 1) {
-                setPredictionMessage({
-                    badge: "!",
-                    title: "High risk detected",
-                    copy: "The model indicates a higher diabetes risk for the current patient values. Review this result carefully and consider medical follow-up.",
-                    suggestion: "Use GlucoGuide Coach next to ask about low-sugar meals, daily activity, sleep habits, and prevention-focused lifestyle changes.",
-                    tone: "error"
-                });
-            } else {
-                setPredictionMessage({
-                    badge: "+",
-                    title: "Low risk indicated",
-                    copy: "The model indicates a lower diabetes risk for the current patient values. Continue healthy monitoring and prevention-focused habits.",
-                    suggestion: "Open GlucoGuide Coach for meal ideas, exercise routines, hydration habits, and sustainable daily prevention tips.",
-                    tone: "success"
-                });
-            }
+            const riskPercent = estimateRiskPercent(result.prediction, allValues);
+            const tone = getRiskTone(riskPercent, result.prediction);
+            const drivers = buildRiskDrivers(allValues);
+            const riskCopy = getRiskCopy(tone, riskPercent, drivers);
+
+            setPredictionMessage({
+                ...riskCopy,
+                tone,
+                riskPercent,
+                drivers
+            });
 
             updateChatbotFromPrediction(result.prediction, {
                 Glucose: Number(data.Glucose),
                 BMI: Number(data.BMI),
                 Age: Number(data.Age)
-            });
+            }, riskPercent);
             setStatus("Prediction completed. GlucoGuide Coach has been updated with the latest screening context.", "success");
         } catch (error) {
             setPredictionMessage({
@@ -908,8 +1179,15 @@ if (predictForm) {
                 title: "Service unavailable",
                 copy: "Prediction service is not reachable right now. Check whether both backend and ML API are running.",
                 suggestion: "Once the service is back, the chatbot area can support users with lifestyle and diabetes-related follow-up queries.",
-                tone: "error"
+                tone: "error",
+                riskPercent: 0
             });
+        } finally {
+            const submitButton = assessmentSubmit || predictForm.querySelector("button[type='submit']");
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = "Analyze Risk";
+            }
         }
     });
 }
@@ -936,6 +1214,7 @@ if (paymentButton) {
     paymentButton.addEventListener("click", startPayment);
 }
 
+initializeAssessmentWizard();
 renderChatbotShortcuts(defaultChatPrompts);
 resetPredictionState();
 setAccessState(false, false);
@@ -1005,3 +1284,43 @@ if (animatedElements.length > 0 && "IntersectionObserver" in window) {
 } else {
     animatedElements.forEach((el) => el.classList.add("is-visible"));
 }
+
+/* ============================================================
+   Light & Dark Theme Switcher
+   ============================================================ */
+const themeToggleBtn = document.getElementById("themeToggleBtn");
+const themeToggleDarkIcon = document.getElementById("themeToggleDarkIcon");
+const themeToggleLightIcon = document.getElementById("themeToggleLightIcon");
+
+function initTheme() {
+    if (!themeToggleBtn || !themeToggleDarkIcon || !themeToggleLightIcon) return;
+
+    // Check localStorage or system preference
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    if (savedTheme === "dark" || (!savedTheme && prefersDark)) {
+        document.body.classList.add("dark-theme");
+        themeToggleDarkIcon.style.display = "none";
+        themeToggleLightIcon.style.display = "block";
+    } else {
+        document.body.classList.remove("dark-theme");
+        themeToggleDarkIcon.style.display = "block";
+        themeToggleLightIcon.style.display = "none";
+    }
+
+    themeToggleBtn.addEventListener("click", () => {
+        const isDark = document.body.classList.toggle("dark-theme");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+
+        if (isDark) {
+            themeToggleDarkIcon.style.display = "none";
+            themeToggleLightIcon.style.display = "block";
+        } else {
+            themeToggleDarkIcon.style.display = "block";
+            themeToggleLightIcon.style.display = "none";
+        }
+    });
+}
+
+initTheme();

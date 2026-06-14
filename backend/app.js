@@ -19,6 +19,8 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || ""
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || ""
 const PAYMENT_AMOUNT_INR = Number(process.env.PAYMENT_AMOUNT_INR || 10)
 const PAYMENT_AMOUNT_PAISE = PAYMENT_AMOUNT_INR * 100
+const ML_API_URL = process.env.ML_API_URL || "https://diabetesplatformmlapi.onrender.com"
+const ML_API_TIMEOUT_MS = Number(process.env.ML_API_TIMEOUT_MS || 20000)
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null
 
 app.use(express.json())
@@ -344,31 +346,58 @@ app.post("/payment/verify", isLoggedIn, async (req, res) => {
 })
 
 app.post("/predict", isLoggedIn, hasPaidAccess, async (req, res) => {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), ML_API_TIMEOUT_MS)
+
     try {
         const payload = {
             ...req.body,
+            Pregnancies: Number(req.body.Pregnancies),
             BMI: Number(req.body.BMI),
             Glucose: Number(req.body.Glucose),
+            BloodPressure: Number(req.body.BloodPressure),
+            SkinThickness: Number(req.body.SkinThickness),
+            Insulin: Number(req.body.Insulin),
             Age: Number(req.body.Age)
+        }
+
+        const requiredFields = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "Age"]
+        const invalidFields = requiredFields.filter((field) => !Number.isFinite(payload[field]))
+
+        if (invalidFields.length > 0) {
+            return res.status(400).json({
+                error: `Invalid prediction input: ${invalidFields.join(", ")} must be numeric`
+            })
         }
 
         payload.BMI_Category = payload.BMI > 30 ? 1 : 0
         payload.High_Glucose = payload.Glucose > 140 ? 1 : 0
         payload.Age_Group = payload.Age > 40 ? 1 : 0
 
-        const response = await fetch("https://diabetesplatformmlapi.onrender.com/predict", {
+        const response = await fetch(`${ML_API_URL.replace(/\/$/, "")}/predict`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
+            signal: controller.signal,
             body: JSON.stringify(payload)
         })
 
-        const data = await response.json()
+        const contentType = response.headers.get("content-type") || ""
+        const data = contentType.includes("application/json")
+            ? await response.json()
+            : { error: await response.text() }
+
         res.status(response.status).json(data)
     } catch (err) {
-        console.log(err)
-        res.status(500).send("Error connecting to ML API")
+        console.error("ML API proxy error:", err)
+        res.status(502).json({
+            error: err.name === "AbortError"
+                ? "ML API timed out. Please try again in a moment."
+                : "Error connecting to ML API. Check ML_API_URL or the deployed model service."
+        })
+    } finally {
+        clearTimeout(timeout)
     }
 })
 

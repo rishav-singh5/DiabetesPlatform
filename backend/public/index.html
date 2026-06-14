@@ -3,24 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="GlucoSense AI — Early diabetes prediction platform with ML-backed screening, Razorpay access, and GlucoGuide AI coaching for everyday health follow-up.">
-    <meta name="theme-color" content="#0d1224">
-    <title>GlucoSense AI</title>
+    <meta name="description" content="GlucoSense AI - a calm diabetes risk check for awareness, prevention, and better doctor conversations.">
+    <meta name="theme-color" content="#f7fbfc">
+    <title>GlucoSense AI | Diabetes Risk Check</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=dark-glass-20260615">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css?v=diabetes-risk-ux-20260615">
 </head>
 <body class="auth-locked">
-    <div class="page-glow page-glow-one"></div>
-    <div class="page-glow page-glow-two"></div>
-
-    <!-- Mobile nav overlay -->
     <div id="mobileNavOverlay" class="mobile-nav-overlay">
-        <nav class="mobile-nav-links">
+        <nav class="mobile-nav-links" aria-label="Mobile navigation">
             <a href="#auth-panel">Access</a>
-            <a href="#prediction-section">Prediction</a>
+            <a href="#prediction-section">Assessment</a>
             <a href="#performance-section">Model Results</a>
             <a href="#chatbot-section">Chatbot</a>
         </nav>
@@ -28,56 +24,83 @@
 
     <main class="app-shell">
         <section class="site-nav-shell">
-            <nav class="site-nav">
+            <nav class="site-nav" aria-label="Primary navigation">
                 <div class="brand">
-                    <div class="brand-mark">G</div>
+                    <div class="brand-mark" aria-hidden="true">G</div>
                     <div>
-                        <p class="brand-name">GLUCOSENSE</p>
-                        <p class="brand-subtitle">Early prediction and diabetes care platform</p>
+                        <p class="brand-name">GlucoSense AI</p>
+                        <p class="brand-subtitle">Private diabetes risk awareness</p>
                     </div>
                 </div>
                 <div class="site-nav-links">
                     <a href="#auth-panel">Access</a>
-                    <a href="#prediction-section">Prediction</a>
+                    <a href="#prediction-section">Assessment</a>
                     <a href="#performance-section">Model Results</a>
                     <a href="#chatbot-section" class="chatbot-nav-link">Chatbot</a>
+                    <button id="themeToggleBtn" class="theme-toggle-btn" type="button" aria-label="Toggle dark mode">
+                        <svg id="themeToggleDarkIcon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="themeToggleLightIcon" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" style="display: none;" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.46 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
                 </div>
                 <button id="hamburgerBtn" class="hamburger-btn" type="button" aria-label="Toggle navigation menu">
-                    <div class="hamburger-icon">
+                    <span class="hamburger-icon" aria-hidden="true">
                         <span></span>
                         <span></span>
                         <span></span>
-                    </div>
+                    </span>
                 </button>
             </nav>
         </section>
 
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-content">
-                <p class="hero-kicker">AI Diabetes Intelligence</p>
-                <h1 id="hero-title">Health is wealth, invest wisely</h1>
+                <p class="hero-kicker">Fast, private, evidence-based</p>
+                <h1 id="hero-title">Diabetes Risk Check - Know Your Numbers, Know Your Path.</h1>
                 <p class="hero-copy">
-                    A refined diabetes screening workspace with model-backed prediction,
-                    secure Razorpay access, and calm AI coaching for everyday follow-up.
+                    Clinically inspired model. 2 minutes. Not a diagnosis - a conversation starter
+                    with your doctor, built to feel calm instead of alarming.
                 </p>
                 <div class="hero-actions">
-                    <a class="primary-link" href="#auth-panel">Enter Workspace</a>
-                    <a class="secondary-link" href="#prediction-section">Explore Screening</a>
+                    <a class="primary-link" href="#auth-panel">Start Assessment</a>
+                    <a class="secondary-link" href="#chatbot-section">Ask GlucoGuide</a>
                 </div>
+                <p class="privacy-note">Anonymous-friendly screening. You are not your numbers.</p>
             </div>
-            <div class="hero-metrics" aria-label="Platform highlights">
-                <article>
-                    <span>86.1%</span>
-                    <p>Best model accuracy</p>
+
+            <div class="hero-visual" aria-label="Diabetes assessment preview">
+                <div class="wave-orbit" aria-hidden="true"></div>
+                <article class="meter-card" aria-label="Glucose meter illustration">
+                    <div class="meter-screen">
+                        <span>Glucose</span>
+                        <strong>108</strong>
+                        <small>mg/dL</small>
+                    </div>
+                    <div class="meter-strip"></div>
                 </article>
-                <article>
-                    <span>Rs 10</span>
-                    <p>Premium unlock</p>
+                <article class="body-signal-card" aria-label="Health signal illustration">
+                    <span class="signal-dot signal-heart"></span>
+                    <span class="signal-dot signal-glucose"></span>
+                    <span class="signal-dot signal-motion"></span>
+                    <div class="body-outline"></div>
                 </article>
-                <article>
-                    <span>AI</span>
-                    <p>Context-aware coach</p>
-                </article>
+                <div class="hero-metrics" aria-label="Platform highlights">
+                    <article>
+                        <span>86.1%</span>
+                        <p>Best model accuracy</p>
+                    </article>
+                    <article>
+                        <span>2 min</span>
+                        <p>Guided check</p>
+                    </article>
+                    <article>
+                        <span>AI</span>
+                        <p>Context-aware coach</p>
+                    </article>
+                </div>
             </div>
         </section>
 
@@ -93,8 +116,8 @@
 
                 <div class="auth-panel-intro">
                     <p>
-                        Access GlucoSense AI to use early diabetes prediction, model-backed screening,
-                        lifestyle guidance, and GlucoGuide chatbot support.
+                        Access GlucoSense AI to use early diabetes risk checks, lifestyle guidance,
+                        and GlucoGuide chatbot support.
                     </p>
                 </div>
 
@@ -107,15 +130,15 @@
                 <form id="register-form" class="form active">
                     <label>
                         <span>Name</span>
-                        <input type="text" name="name" placeholder="Rishav Singh" required>
+                        <input type="text" name="name" placeholder="Rishav Singh" autocomplete="name" required>
                     </label>
                     <label>
                         <span>Email</span>
-                        <input type="email" name="email" placeholder="rishav@example.com" required>
+                        <input type="email" name="email" placeholder="rishav@example.com" autocomplete="email" required>
                     </label>
                     <label>
                         <span>Password</span>
-                        <input type="password" name="password" placeholder="Minimum 6 characters" required>
+                        <input type="password" name="password" placeholder="Minimum 6 characters" autocomplete="new-password" required>
                     </label>
                     <button type="submit" class="primary-button">Create account</button>
                 </form>
@@ -123,11 +146,11 @@
                 <form id="login-form" class="form">
                     <label>
                         <span>Email</span>
-                        <input type="email" name="email" placeholder="rishav@example.com" required>
+                        <input type="email" name="email" placeholder="rishav@example.com" autocomplete="email" required>
                     </label>
                     <label>
                         <span>Password</span>
-                        <input type="password" name="password" placeholder="Your password" required>
+                        <input type="password" name="password" placeholder="Your password" autocomplete="current-password" required>
                     </label>
                     <button type="submit" class="primary-button">Sign in</button>
                 </form>
@@ -135,15 +158,15 @@
                 <form id="forgot-form" class="form">
                     <label>
                         <span>Email</span>
-                        <input type="email" name="email" placeholder="rishav@example.com" required>
+                        <input type="email" name="email" placeholder="rishav@example.com" autocomplete="email" required>
                     </label>
                     <label>
                         <span>New Password</span>
-                        <input type="password" name="password" placeholder="Minimum 6 characters" minlength="6" required>
+                        <input type="password" name="password" placeholder="Minimum 6 characters" minlength="6" autocomplete="new-password" required>
                     </label>
                     <label>
                         <span>Confirm Password</span>
-                        <input type="password" name="confirmPassword" placeholder="Repeat new password" minlength="6" required>
+                        <input type="password" name="confirmPassword" placeholder="Repeat new password" minlength="6" autocomplete="new-password" required>
                     </label>
                     <button type="submit" class="primary-button">Reset password</button>
                 </form>
@@ -171,19 +194,19 @@
                 </div>
 
                 <p class="workspace-overview-copy">
-                    Sign in to access diabetes screening, context-aware chatbot replies, and a calmer guided workflow.
+                    Sign in to access the guided diabetes risk check, context-aware chatbot replies, and a calmer follow-up workflow.
                 </p>
 
                 <div class="workspace-overview-grid">
                     <article class="workspace-mini-card">
                         <span>01</span>
-                        <strong>Protected Access</strong>
-                        <p>Prediction and chatbot guidance stay locked until the user logs in.</p>
+                        <strong>Private by default</strong>
+                        <p>Clear session controls and a permanently visible educational-use disclaimer.</p>
                     </article>
                     <article class="workspace-mini-card">
                         <span>02</span>
-                        <strong>Smart Follow-Up</strong>
-                        <p>Latest prediction context is used in chatbot answers for more useful next steps.</p>
+                        <strong>Smart follow-up</strong>
+                        <p>Latest assessment context is used in chatbot answers for more useful next steps.</p>
                     </article>
                 </div>
             </section>
@@ -191,13 +214,13 @@
 
         <section id="lockedNotice" class="feature-card access-lock-card" data-animate="fade-up">
             <p class="card-kicker">Protected Workspace</p>
-                <h2>Login first to unlock screening, AI coaching, and guided follow-up</h2>
+            <h2>Login first to unlock screening, AI coaching, and guided follow-up</h2>
             <p>
                 GlucoSense AI services stay locked until the user signs in. After login, the prediction engine,
-                diabetes support sections, and the GlucoGuide Coach area can be unlocked in the same workspace.
+                diabetes support sections, and GlucoGuide Coach area can be unlocked in the same workspace.
             </p>
             <div class="tag-row">
-                <span>Prediction Locked</span>
+                <span>Assessment Locked</span>
                 <span>Chatbot Locked</span>
                 <span>Login Required</span>
             </div>
@@ -222,222 +245,272 @@
         </section>
 
         <div id="serviceArea" class="service-area" aria-hidden="true">
-        <section id="prediction-section" class="prediction-section" data-animate="fade-up">
-            <div class="section-heading">
-                <p class="eyebrow">Prediction Engine</p>
-                <h2>Run a composed diabetes risk screening</h2>
-                <p class="lead">Enter patient details within the suggested clinical range and receive a clear result with the next step ready to act on.</p>
-            </div>
-
-            <form id="predictForm" class="prediction-form" novalidate>
-                <label class="prediction-field">
-                    <span>Pregnancies</span>
-                    <input type="number" name="Pregnancies" placeholder="e.g. 2" min="0" max="20" step="1" required />
-                    <small>Allowed range: 0 to 20</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>Glucose</span>
-                    <input type="number" name="Glucose" placeholder="e.g. 120" min="0" max="250" step="1" required />
-                    <small>Allowed range: 0 to 250 mg/dL</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>Blood Pressure</span>
-                    <input type="number" name="BloodPressure" placeholder="e.g. 70" min="0" max="140" step="1" required />
-                    <small>Allowed range: 0 to 140 mmHg</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>Skin Thickness</span>
-                    <input type="number" name="SkinThickness" placeholder="e.g. 25" min="0" max="100" step="1" required />
-                    <small>Allowed range: 0 to 100 mm</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>Insulin</span>
-                    <input type="number" name="Insulin" placeholder="e.g. 80" min="0" max="900" step="1" required />
-                    <small>Allowed range: 0 to 900 mu U/ml</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>BMI</span>
-                    <input type="number" name="BMI" placeholder="e.g. 28.5" min="0" max="70" step="0.1" required />
-                    <small>Allowed range: 0 to 70</small>
-                </label>
-
-                <label class="prediction-field">
-                    <span>Age</span>
-                    <input type="number" name="Age" placeholder="e.g. 35" min="1" max="120" step="1" required />
-                    <small>Allowed range: 1 to 120 years</small>
-                </label>
-
-                <div class="prediction-actions">
-                    <button type="submit" class="primary-button">Predict Now</button>
+            <section id="prediction-section" class="prediction-section" data-animate="fade-up">
+                <div class="section-heading">
+                    <p class="eyebrow">Assessment</p>
+                    <h2>One question at a time, no overwhelm</h2>
+                    <p class="lead">Answer a short set of risk-factor questions. The model output is educational only and should be discussed with a qualified provider.</p>
                 </div>
-            </form>
 
-            <section id="predictionResult" class="result-box" data-tone="info" aria-live="polite">
-                <div class="prediction-result-head">
-                    <div id="predictionBadge" class="prediction-badge" data-tone="info">GS</div>
-                    <div>
-                        <p class="result-eyebrow">Prediction Output</p>
-                        <h3 id="predictionTitle">Prediction result will appear here</h3>
-                    </div>
-                </div>
-                <p id="predictionCopy" class="prediction-copy">
-                    Submit valid patient values to see the diabetes risk result along with the next suggested step.
-                </p>
-                <div class="prediction-followup">
-                    <p id="predictionSuggestion" class="prediction-suggestion">
-                        After the result, users can continue to the chatbot area for diet and lifestyle guidance.
-                    </p>
-                    <a id="predictionChatbotLink" href="#chatbot-section" class="prediction-chatbot-link">
-                        Open Chatbot
-                    </a>
-                </div>
-            </section>
-        </section>
-
-        <section id="chatbot-section" class="chatbot-section" data-animate="fade-up">
-            <div class="chatbot-shell">
-                <article class="chatbot-story">
-                    <div class="section-heading">
-                        <p class="eyebrow">Diabetes Coach</p>
-                        <h2>Meet GlucoGuide Coach</h2>
-                        <p class="lead">
-                            A premium AI coach for everyday questions, study help, writing, productivity,
-                            and diabetes-aware guidance inside the same GlucoSense AI workspace.
-                        </p>
+                <form id="predictForm" class="prediction-form" novalidate>
+                    <div class="assessment-progress" aria-label="Assessment progress">
+                        <span id="assessmentStepLabel">Step 1 of 9</span>
+                        <div class="progress-track"><span id="assessmentProgressBar"></span></div>
                     </div>
 
-                    <div class="chatbot-brand-block">
-                        <div class="chatbot-brand-mark-large">GC</div>
+                    <div class="wizard-step active" data-step="0">
+                        <label class="prediction-field range-field">
+                            <span>Age</span>
+                            <strong class="range-value" data-output-for="Age">35 years</strong>
+                            <input type="range" name="Age" min="1" max="120" step="1" value="35" aria-label="Age slider, currently 35 years" required>
+                            <small>Use arrow keys or drag the slider. Typical adult screening starts at routine checkups.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="1">
+                        <label class="prediction-field range-field">
+                            <span>BMI</span>
+                            <strong class="range-value" data-output-for="BMI">24.5</strong>
+                            <input type="range" name="BMI" min="10" max="70" step="0.1" value="24.5" aria-label="BMI slider, currently 24.5" required>
+                            <small>Healthy range is highlighted visually as values change.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="2">
+                        <label class="prediction-field range-field">
+                            <span>Fasting glucose, if known</span>
+                            <strong class="range-value" data-output-for="Glucose">110 mg/dL</strong>
+                            <input type="range" name="Glucose" min="0" max="250" step="1" value="110" aria-label="Glucose level slider, currently 110 mg/dL" required>
+                            <small>Optional in real life, required here for the trained model. Use a recent value if available.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="3">
+                        <label class="prediction-field range-field">
+                            <span>Blood pressure</span>
+                            <strong class="range-value" data-output-for="BloodPressure">72 mmHg</strong>
+                            <input type="range" name="BloodPressure" min="0" max="140" step="1" value="72" aria-label="Blood pressure slider, currently 72 mmHg" required>
+                            <small>Move gently into the value range. Extreme values show guidance before submitting.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="4">
+                        <label class="prediction-field range-field">
+                            <span>Pregnancies, if applicable</span>
+                            <strong class="range-value" data-output-for="Pregnancies">0</strong>
+                            <input type="range" name="Pregnancies" min="0" max="20" step="1" value="0" aria-label="Pregnancies slider, currently 0" required>
+                            <small>Select 0 when this does not apply.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="5">
+                        <label class="prediction-field range-field">
+                            <span>Skin thickness</span>
+                            <strong class="range-value" data-output-for="SkinThickness">25 mm</strong>
+                            <input type="range" name="SkinThickness" min="0" max="100" step="1" value="25" aria-label="Skin thickness slider, currently 25 mm" required>
+                            <small>This keeps compatibility with the trained diabetes dataset.</small>
+                        </label>
+                    </div>
+
+                    <div class="wizard-step" data-step="6">
+                        <label class="prediction-field range-field">
+                            <span>Insulin</span>
+                            <strong class="range-value" data-output-for="Insulin">80 mu U/ml</strong>
+                            <input type="range" name="Insulin" min="0" max="900" step="1" value="80" aria-label="Insulin slider, currently 80 mu U/ml" required>
+                            <small>If unknown, keep the default and mention this uncertainty to your provider.</small>
+                        </label>
+                    </div>
+
+                    <fieldset class="wizard-step choice-step" data-step="7">
+                        <legend>Family history of diabetes?</legend>
+                        <div class="segmented-options" role="radiogroup" aria-label="Family history of diabetes">
+                            <label><input type="radio" name="FamilyHistory" value="yes"><span>Yes</span></label>
+                            <label><input type="radio" name="FamilyHistory" value="no" checked><span>No</span></label>
+                            <label><input type="radio" name="FamilyHistory" value="unknown"><span>Don't know</span></label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="wizard-step choice-step" data-step="8">
+                        <legend>Physical activity level</legend>
+                        <div class="segmented-options" role="radiogroup" aria-label="Physical activity level">
+                            <label><input type="radio" name="ActivityLevel" value="low"><span>Low</span></label>
+                            <label><input type="radio" name="ActivityLevel" value="moderate" checked><span>Moderate</span></label>
+                            <label><input type="radio" name="ActivityLevel" value="high"><span>High</span></label>
+                        </div>
+                    </fieldset>
+
+                    <p id="assessmentHint" class="assessment-hint" role="status">Knowing your risk is the first smart step.</p>
+                    <div class="prediction-actions">
+                        <button id="assessmentBack" type="button" class="secondary-button">Back</button>
+                        <button id="assessmentNext" type="button" class="primary-button">Continue</button>
+                        <button id="assessmentSubmit" type="submit" class="primary-button">Analyze Risk</button>
+                    </div>
+                </form>
+
+                <section id="predictionResult" class="result-box" data-tone="info" aria-live="polite">
+                    <div class="prediction-result-head">
+                        <div id="predictionBadge" class="prediction-badge" data-tone="info">GS</div>
                         <div>
-                            <p class="card-kicker">Coach Identity</p>
-                            <h3>General AI support with smart diabetes context</h3>
-                            <p>
-                                Ask about assignments, coding, writing, planning, health basics, breakfast plans,
-                                glucose concepts, or what to do after a higher-risk result. The coach stays useful,
-                                practical, and context-aware.
+                            <p class="result-eyebrow">Assessment Output</p>
+                            <h3 id="predictionTitle">Your assessment summary will appear here</h3>
+                        </div>
+                    </div>
+                    <p id="predictionCopy" class="prediction-copy">
+                        Complete the short guided flow to see an estimated risk result and doctor-friendly next steps.
+                    </p>
+                    <div id="riskMeter" class="risk-meter" aria-hidden="true">
+                        <span></span>
+                    </div>
+                    <div id="driverList" class="driver-list" aria-label="Key risk drivers"></div>
+                    <div class="prediction-followup">
+                        <p id="predictionSuggestion" class="prediction-suggestion">
+                            This is for research and awareness, not a medical diagnosis.
+                        </p>
+                        <a id="predictionChatbotLink" href="#chatbot-section" class="prediction-chatbot-link">
+                            Open Chatbot
+                        </a>
+                    </div>
+                </section>
+            </section>
+
+            <section id="chatbot-section" class="chatbot-section" data-animate="fade-up">
+                <div class="chatbot-shell">
+                    <article class="chatbot-story">
+                        <div class="section-heading">
+                            <p class="eyebrow">Diabetes Coach</p>
+                            <h2>Meet GlucoGuide Coach</h2>
+                            <p class="lead">
+                                A premium AI coach for everyday questions, study help, writing, productivity,
+                                and diabetes-aware guidance inside the same GlucoSense AI workspace.
                             </p>
                         </div>
-                    </div>
 
-                    <div class="chatbot-signal-grid">
-                        <article>
-                            <span>01</span>
-                            <h3>Context-aware</h3>
-                            <p>Latest screening context is carried into replies after every diabetes prediction.</p>
-                        </article>
-                        <article>
-                            <span>02</span>
-                            <h3>General and health help</h3>
-                            <p>Useful for broad questions while still supporting food, hydration, sleep, and activity.</p>
-                        </article>
-                        <article>
-                            <span>03</span>
-                            <h3>Safety-conscious</h3>
-                            <p>Flags urgent symptoms and reminds users when clinician support matters most.</p>
-                        </article>
-                    </div>
-
-                    <section class="chatbot-context-card" aria-live="polite">
-                        <p class="card-kicker">Coach Context</p>
-                        <h3 id="chatbotContextTitle">Waiting for your latest screening context</h3>
-                        <p id="chatbotContextCopy">
-                            Run a prediction to let the chatbot adapt its guidance around current diabetes risk signals.
-                        </p>
-                    </section>
-                </article>
-
-                <section class="chatbot-panel">
-                    <div class="chatbot-panel-head">
-                        <div class="chatbot-brand-inline">
-                            <div class="chatbot-brand-chip">GC</div>
+                        <div class="chatbot-brand-block">
+                            <div class="chatbot-brand-mark-large">GC</div>
                             <div>
-                                <p class="card-kicker">Live Coach</p>
-                                <h3>GlucoGuide Coach</h3>
+                                <p class="card-kicker">Coach Identity</p>
+                                <h3>General AI support with smart diabetes context</h3>
+                                <p>
+                                    Ask about assignments, coding, writing, planning, health basics, breakfast plans,
+                                    glucose concepts, or what to do after a higher-risk result. The coach stays useful,
+                                    practical, and context-aware.
+                                </p>
                             </div>
                         </div>
-                        <span id="chatbotStatusPill" class="chatbot-status-pill">Ready to guide</span>
-                    </div>
 
-                    <div id="chatbotMessages" class="chatbot-messages" aria-live="polite"></div>
+                        <div class="chatbot-signal-grid">
+                            <article>
+                                <span>01</span>
+                                <h3>Context-aware</h3>
+                                <p>Latest screening context is carried into replies after every diabetes prediction.</p>
+                            </article>
+                            <article>
+                                <span>02</span>
+                                <h3>General and health help</h3>
+                                <p>Useful for broad questions while still supporting food, hydration, sleep, and activity.</p>
+                            </article>
+                            <article>
+                                <span>03</span>
+                                <h3>Safety-conscious</h3>
+                                <p>Flags urgent symptoms and reminds users when clinician support matters most.</p>
+                            </article>
+                        </div>
 
-                    <div class="chatbot-shortcuts">
-                        <button type="button" class="chatbot-shortcut" data-prompt="What breakfast is diabetes-friendly?">Breakfast ideas</button>
-                        <button type="button" class="chatbot-shortcut" data-prompt="How can I lower my diabetes risk?">Lower risk</button>
-                        <button type="button" class="chatbot-shortcut" data-prompt="Explain HbA1c in simple words.">HbA1c</button>
-                        <button type="button" class="chatbot-shortcut" data-prompt="Give me a simple walking routine for diabetes prevention.">Walking plan</button>
-                        <button type="button" class="chatbot-shortcut" data-prompt="What symptoms should I not ignore?">Symptoms</button>
-                        <button type="button" class="chatbot-shortcut" data-prompt="Help me write a professional email.">Email help</button>
-                    </div>
+                        <section class="chatbot-context-card" aria-live="polite">
+                            <p class="card-kicker">Coach Context</p>
+                            <h3 id="chatbotContextTitle">Waiting for your latest screening context</h3>
+                            <p id="chatbotContextCopy">
+                                Run a prediction to let the chatbot adapt its guidance around current diabetes risk signals.
+                            </p>
+                        </section>
+                    </article>
 
-                    <form id="chatbotForm" class="chatbot-form">
-                        <label class="sr-only" for="chatbotInput">Ask GlucoGuide Coach</label>
-                        <textarea
-                            id="chatbotInput"
-                            name="message"
-                            rows="4"
-                            maxlength="500"
-                            placeholder="Ask anything: studies, coding, writing, planning, or diabetes-related food, glucose, exercise, hydration, and prediction follow-up..."
-                            required
-                        ></textarea>
-                        <button type="submit" class="primary-button">Ask Coach</button>
-                    </form>
+                    <section class="chatbot-panel">
+                        <div class="chatbot-panel-head">
+                            <div class="chatbot-brand-inline">
+                                <div class="chatbot-brand-chip">GC</div>
+                                <div>
+                                    <p class="card-kicker">Live Coach</p>
+                                    <h3>GlucoGuide Coach</h3>
+                                </div>
+                            </div>
+                            <span id="chatbotStatusPill" class="chatbot-status-pill">Ready to guide</span>
+                        </div>
 
-                    <p class="chatbot-disclaimer">
-                        Educational support only. This chatbot does not diagnose, prescribe, or replace a licensed clinician.
-                    </p>
-                </section>
-            </div>
-        </section>
+                        <div id="chatbotMessages" class="chatbot-messages" aria-live="polite"></div>
 
-        <section id="performance-section" class="performance-section" data-animate="fade-up">
-            <div class="section-heading">
-                <p class="eyebrow">Model Results</p>
-                <h2>Validation snapshots from the trained screening models</h2>
-                <p class="lead">
-                    These visuals show the current model accuracy comparison and the classification report for the best-performing model.
-                </p>
-                <div class="performance-tags">
-                    <span>Best Model: Random Forest</span>
-                    <span>Accuracy: 86.1%</span>
+                        <div class="chatbot-shortcuts">
+                            <button type="button" class="chatbot-shortcut" data-prompt="What breakfast is diabetes-friendly?">Breakfast ideas</button>
+                            <button type="button" class="chatbot-shortcut" data-prompt="How can I lower my diabetes risk?">Lower risk</button>
+                            <button type="button" class="chatbot-shortcut" data-prompt="Explain HbA1c in simple words.">HbA1c</button>
+                            <button type="button" class="chatbot-shortcut" data-prompt="Give me a simple walking routine for diabetes prevention.">Walking plan</button>
+                            <button type="button" class="chatbot-shortcut" data-prompt="What symptoms should I not ignore?">Symptoms</button>
+                            <button type="button" class="chatbot-shortcut" data-prompt="Help me write a professional email.">Email help</button>
+                        </div>
+
+                        <form id="chatbotForm" class="chatbot-form">
+                            <label class="sr-only" for="chatbotInput">Ask GlucoGuide Coach</label>
+                            <textarea
+                                id="chatbotInput"
+                                name="message"
+                                rows="4"
+                                maxlength="500"
+                                placeholder="Ask anything: studies, coding, writing, planning, or diabetes-related food, glucose, exercise, hydration, and prediction follow-up..."
+                                required
+                            ></textarea>
+                            <button type="submit" class="primary-button">Ask Coach</button>
+                        </form>
+
+                        <p class="chatbot-disclaimer">
+                            Educational support only. This chatbot does not diagnose, prescribe, or replace a licensed clinician.
+                        </p>
+                    </section>
                 </div>
-            </div>
+            </section>
 
-            <div class="performance-grid">
-                <article class="performance-card">
-                    <div class="panel-header">
-                        <div>
-                            <p class="card-kicker">Accuracy Snapshot</p>
-                            <h3>Three-model accuracy scores</h3>
-                        </div>
+            <section id="performance-section" class="performance-section" data-animate="fade-up">
+                <div class="section-heading">
+                    <p class="eyebrow">Model Results</p>
+                    <h2>Validation snapshots from the trained screening models</h2>
+                    <p class="lead">
+                        These visuals show the current model accuracy comparison and the classification report for the best-performing model.
+                    </p>
+                    <div class="performance-tags">
+                        <span>Best Model: Random Forest</span>
+                        <span>Accuracy: 86.1%</span>
                     </div>
-                    <img
-                        class="performance-image"
-                        src="/accuracyScores.png"
-                        alt="Chart showing the accuracy scores for three trained machine learning models."
-                    >
-                </article>
+                </div>
 
-                <article class="performance-card">
-                    <div class="panel-header">
-                        <div>
-                            <p class="card-kicker">Best Model Report</p>
-                            <h3>Classification report</h3>
+                <div class="performance-grid">
+                    <article class="performance-card">
+                        <div class="panel-header">
+                            <div>
+                                <p class="card-kicker">Accuracy Snapshot</p>
+                                <h3>Three-model accuracy scores</h3>
+                            </div>
                         </div>
-                    </div>
-                    <img
-                        class="performance-image"
-                        src="/classificationReport.png"
-                        alt="Classification report for the best-performing diabetes prediction model."
-                    >
-                </article>
-            </div>
-        </section>
+                        <img
+                            class="performance-image"
+                            src="/accuracyScores.png"
+                            alt="Chart showing the accuracy scores for three trained machine learning models."
+                        >
+                    </article>
 
+                    <article class="performance-card">
+                        <div class="panel-header">
+                            <div>
+                                <p class="card-kicker">Best Model Report</p>
+                                <h3>Classification report</h3>
+                            </div>
+                        </div>
+                        <img
+                            class="performance-image"
+                            src="/classificationReport.png"
+                            alt="Classification report for the best-performing diabetes prediction model."
+                        >
+                    </article>
+                </div>
+            </section>
         </div>
 
         <footer class="site-footer">
@@ -452,20 +525,19 @@
                 </p>
                 <div class="footer-links">
                     <a href="#auth-panel">Access</a>
-                    <span class="footer-divider">·</span>
-                    <a href="#prediction-section">Prediction</a>
-                    <span class="footer-divider">·</span>
+                    <span class="footer-divider">.</span>
+                    <a href="#prediction-section">Assessment</a>
+                    <span class="footer-divider">.</span>
                     <a href="#chatbot-section">Chatbot</a>
-                    <span class="footer-divider">·</span>
+                    <span class="footer-divider">.</span>
                     <a href="#performance-section">Model Results</a>
                 </div>
-                <p class="footer-copy">© 2025 GlucoSense AI · Educational use only · Does not replace clinical advice</p>
+                <p class="footer-copy">For research and awareness - not a medical device. This tool does not replace clinical advice.</p>
             </div>
         </footer>
-
     </main>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="/script.js?v=dark-glass-20260615"></script>
+    <script src="/script.js?v=diabetes-risk-ux-20260615"></script>
 </body>
 </html>
