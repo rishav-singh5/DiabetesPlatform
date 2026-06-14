@@ -22,6 +22,8 @@ const chatbotShortcuts = document.querySelector(".chatbot-shortcuts");
 const chatbotContextTitle = document.getElementById("chatbotContextTitle");
 const chatbotContextCopy = document.getElementById("chatbotContextCopy");
 const chatbotStatusPill = document.getElementById("chatbotStatusPill");
+const hamburgerBtn = document.getElementById("hamburgerBtn");
+const mobileNavOverlay = document.getElementById("mobileNavOverlay");
 
 document.querySelectorAll('.site-nav-links a[href="#paymentNotice"]').forEach((link) => {
     link.remove();
@@ -938,3 +940,68 @@ renderChatbotShortcuts(defaultChatPrompts);
 resetPredictionState();
 setAccessState(false, false);
 syncAccessState();
+
+/* ============================================================
+   Hamburger Menu Toggle
+   ============================================================ */
+function toggleMobileNav() {
+    if (!hamburgerBtn || !mobileNavOverlay) return;
+    const isOpen = mobileNavOverlay.classList.toggle("is-open");
+    hamburgerBtn.classList.toggle("is-open", isOpen);
+    document.body.style.overflow = isOpen ? "hidden" : "";
+}
+
+function closeMobileNav() {
+    if (!hamburgerBtn || !mobileNavOverlay) return;
+    mobileNavOverlay.classList.remove("is-open");
+    hamburgerBtn.classList.remove("is-open");
+    document.body.style.overflow = "";
+}
+
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener("click", toggleMobileNav);
+}
+
+if (mobileNavOverlay) {
+    mobileNavOverlay.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMobileNav);
+    });
+
+    mobileNavOverlay.addEventListener("click", (e) => {
+        if (e.target === mobileNavOverlay) {
+            closeMobileNav();
+        }
+    });
+}
+
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 1100) {
+        closeMobileNav();
+    }
+});
+
+/* ============================================================
+   Scroll-Triggered Entrance Animations
+   ============================================================ */
+const animatedElements = document.querySelectorAll("[data-animate]");
+
+if (animatedElements.length > 0 && "IntersectionObserver" in window) {
+    const animationObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("is-visible");
+                    animationObserver.unobserve(entry.target);
+                }
+            });
+        },
+        {
+            threshold: 0.1,
+            rootMargin: "0px 0px -40px 0px"
+        }
+    );
+
+    animatedElements.forEach((el) => animationObserver.observe(el));
+} else {
+    animatedElements.forEach((el) => el.classList.add("is-visible"));
+}

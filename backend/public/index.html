@@ -3,16 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="GlucoSense AI — Early diabetes prediction platform with ML-backed screening, Razorpay access, and GlucoGuide AI coaching for everyday health follow-up.">
+    <meta name="theme-color" content="#0d1224">
     <title>GlucoSense AI</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=clean-responsive-20260519">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css?v=dark-glass-20260615">
 </head>
 <body class="auth-locked">
     <div class="page-glow page-glow-one"></div>
     <div class="page-glow page-glow-two"></div>
+
+    <!-- Mobile nav overlay -->
+    <div id="mobileNavOverlay" class="mobile-nav-overlay">
+        <nav class="mobile-nav-links">
+            <a href="#auth-panel">Access</a>
+            <a href="#prediction-section">Prediction</a>
+            <a href="#performance-section">Model Results</a>
+            <a href="#chatbot-section">Chatbot</a>
+        </nav>
+    </div>
 
     <main class="app-shell">
         <section class="site-nav-shell">
@@ -30,6 +42,13 @@
                     <a href="#performance-section">Model Results</a>
                     <a href="#chatbot-section" class="chatbot-nav-link">Chatbot</a>
                 </div>
+                <button id="hamburgerBtn" class="hamburger-btn" type="button" aria-label="Toggle navigation menu">
+                    <div class="hamburger-icon">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
             </nav>
         </section>
 
@@ -62,7 +81,7 @@
             </div>
         </section>
 
-        <section id="auth-panel" class="workspace-grid workspace-command">
+        <section id="auth-panel" class="workspace-grid workspace-command" data-animate="fade-up">
             <section class="auth-panel auth-panel-wide">
                 <div class="panel-header">
                     <div>
@@ -170,7 +189,7 @@
             </section>
         </section>
 
-        <section id="lockedNotice" class="feature-card access-lock-card">
+        <section id="lockedNotice" class="feature-card access-lock-card" data-animate="fade-up">
             <p class="card-kicker">Protected Workspace</p>
                 <h2>Login first to unlock screening, AI coaching, and guided follow-up</h2>
             <p>
@@ -184,7 +203,7 @@
             </div>
         </section>
 
-        <section id="paymentNotice" class="feature-card payment-lock-card">
+        <section id="paymentNotice" class="feature-card payment-lock-card" data-animate="fade-up">
             <div class="panel-header">
                 <div>
                     <p class="card-kicker">Premium Access</p>
@@ -203,7 +222,7 @@
         </section>
 
         <div id="serviceArea" class="service-area" aria-hidden="true">
-        <section id="prediction-section" class="prediction-section">
+        <section id="prediction-section" class="prediction-section" data-animate="fade-up">
             <div class="section-heading">
                 <p class="eyebrow">Prediction Engine</p>
                 <h2>Run a composed diabetes risk screening</h2>
@@ -280,7 +299,7 @@
             </section>
         </section>
 
-        <section id="chatbot-section" class="chatbot-section">
+        <section id="chatbot-section" class="chatbot-section" data-animate="fade-up">
             <div class="chatbot-shell">
                 <article class="chatbot-story">
                     <div class="section-heading">
@@ -375,7 +394,7 @@
             </div>
         </section>
 
-        <section id="performance-section" class="performance-section">
+        <section id="performance-section" class="performance-section" data-animate="fade-up">
             <div class="section-heading">
                 <p class="eyebrow">Model Results</p>
                 <h2>Validation snapshots from the trained screening models</h2>
@@ -421,9 +440,32 @@
 
         </div>
 
+        <footer class="site-footer">
+            <div class="site-footer-inner">
+                <div class="footer-brand">
+                    <div class="footer-brand-mark">G</div>
+                    <span class="footer-brand-name">GlucoSense AI</span>
+                </div>
+                <p class="footer-copy">
+                    Early diabetes prediction platform powered by machine learning.
+                    Built with care for accessible, intelligent health screening.
+                </p>
+                <div class="footer-links">
+                    <a href="#auth-panel">Access</a>
+                    <span class="footer-divider">·</span>
+                    <a href="#prediction-section">Prediction</a>
+                    <span class="footer-divider">·</span>
+                    <a href="#chatbot-section">Chatbot</a>
+                    <span class="footer-divider">·</span>
+                    <a href="#performance-section">Model Results</a>
+                </div>
+                <p class="footer-copy">© 2025 GlucoSense AI · Educational use only · Does not replace clinical advice</p>
+            </div>
+        </footer>
+
     </main>
 
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <script src="/script.js?v=clean-responsive-20260519"></script>
+    <script src="/script.js?v=dark-glass-20260615"></script>
 </body>
 </html>
